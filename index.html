@@ -1,0 +1,3990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Finance Suite</title>
+<style>
+:root{
+  --bg:#f2efff;
+  --bg2:#eae6ff;
+  --card:#ffffff;
+  --cb:rgba(120,80,240,0.10);
+  --csh:0 2px 18px rgba(120,80,240,0.09);
+  --text:#1a1040;
+  --dim:#7c78a8;
+  --subdim:#b0acd4;
+  --p1:#6d28d9;--p2:#2563eb;
+  --pg:linear-gradient(135deg,#6d28d9,#2563eb);
+  --v1:#b45309;--v2:#dc2626;
+  --vg:linear-gradient(135deg,#d97706,#dc2626);
+  --e1:#0f766e;--e2:#0369a1;
+  --eg:linear-gradient(135deg,#0f766e,#0369a1);
+  --grn:#059669;--red:#dc2626;--gld:#b45309;
+  --plight:#ede9fe;--vlight:#fef3c7;--elight:#ccfbf1;
+  --tab:72px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:-webkit-fill-available;overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;
+}
+/* blobs — subtle on light bg */
+.blobs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.b{position:absolute;border-radius:50%;filter:blur(100px);opacity:.07}
+.b1{width:360px;height:360px;background:#7c3aed;top:-120px;left:-100px}
+.b2{width:280px;height:280px;background:#2563eb;top:30%;right:-80px}
+.b3{width:220px;height:220px;background:#0d9488;bottom:25%;left:-40px}
+
+/* layout */
+.app{position:relative;z-index:1;width:100%;max-width:430px;margin:0 auto;min-height:100vh}
+
+/* header */
+.hdr{
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 18px 8px;
+  display:flex;align-items:center;gap:12px;
+  background:linear-gradient(180deg,rgba(242,239,255,1) 60%,rgba(242,239,255,0));
+}
+.hico{
+  width:42px;height:42px;background:var(--pg);border-radius:13px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 3px 14px rgba(109,40,217,.3);flex-shrink:0;
+}
+.htitle{font-size:21px;font-weight:800;letter-spacing:-.4px;color:var(--text)}
+.hsub{font-size:11px;color:var(--dim);margin-top:1px}
+
+/* tabs */
+.tab{display:none;padding:0 calc(14px + env(safe-area-inset-right,0px)) calc(var(--tab) + env(safe-area-inset-bottom,0px) + 20px) calc(14px + env(safe-area-inset-left,0px));animation:fi .25s ease}
+.tab.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* tab bar */
+.tbbar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  height:calc(var(--tab) + env(safe-area-inset-bottom,0px));
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:env(safe-area-inset-left,0px);
+  padding-right:env(safe-area-inset-right,0px);
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(120,80,240,0.12);
+  box-shadow:0 -3px 18px rgba(120,80,240,0.08);
+  display:flex;z-index:200;
+}
+.tbtn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:none;color:var(--dim);
+  font-size:10px;font-weight:600;cursor:pointer;transition:color .2s;padding:8px 2px;min-height:44px;
+}
+.tbtn .ti{font-size:22px;transition:transform .2s}
+.tbtn.on{color:var(--p1);background:rgba(109,40,217,0.12);border-radius:12px}
+.tbtn.on .ti{transform:scale(1.18)}
+
+/* cards */
+.card{
+  background:var(--card);border:1px solid var(--cb);border-radius:20px;
+  padding:15px 15px;margin-bottom:12px;
+  box-shadow:var(--csh);
+}
+.card.vil{border-color:rgba(217,119,6,0.2);box-shadow:0 2px 18px rgba(217,119,6,0.08)}
+.ct{font-size:10.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.9px;margin-bottom:11px}
+
+/* inputs */
+.irow{display:flex;gap:9px;margin-bottom:10px}
+.ig{flex:1;display:flex;flex-direction:column;gap:5px}
+.ilbl{font-size:12px;color:var(--dim);font-weight:500}
+.if{
+  background:#faf8ff;border:1.5px solid #ddd8f8;border-radius:12px;
+  padding:10px 12px;color:var(--text);font-size:16px;font-weight:500;
+  outline:none;width:100%;transition:border-color .2s,background .2s;
+  -webkit-appearance:none;min-height:44px;
+}
+.if:focus{border-color:var(--p1);background:#fff}
+.if::placeholder{color:#c4bfe8}
+input[type=date]{color-scheme:light}
+select.if{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237c78a8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+}
+
+/* big input */
+.bwrap{position:relative;margin-bottom:11px}
+.pre{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:21px;font-weight:700;pointer-events:none;z-index:1}
+.biginput{font-size:28px!important;font-weight:800!important;padding:14px 12px 14px 32px!important;letter-spacing:-.5px!important;color:var(--text)!important}
+
+/* segments */
+.seg{display:flex;background:#ece8ff;border-radius:11px;padding:3px;gap:2px;margin-bottom:11px}
+.sb{
+  flex:1;padding:10px 5px;border:none;border-radius:8px;background:none;
+  color:var(--dim);font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .2s;text-align:center;white-space:nowrap;min-height:44px;
+}
+.sb.on{background:var(--pg);color:#fff;box-shadow:0 2px 8px rgba(109,40,217,.35)}
+.sb.vl.on{background:var(--vg);box-shadow:0 2px 8px rgba(217,119,6,.35)}
+.sb.em.on{background:var(--eg);box-shadow:0 2px 8px rgba(15,118,110,.35)}
+.seg.vseg{background:#fef3c7}
+.seg.eseg{background:#ccfbf1}
+
+/* calc button */
+.cbtn{
+  width:100%;padding:15px;border:none;border-radius:14px;color:#fff;
+  font-size:16px;font-weight:700;cursor:pointer;
+  transition:opacity .18s,transform .12s;margin-top:2px;letter-spacing:.2px;
+}
+.cbtn:active{opacity:.82;transform:scale(.988)}
+.cbtn.p{background:var(--pg);box-shadow:0 4px 18px rgba(109,40,217,.38)}
+.cbtn.v{background:var(--vg);box-shadow:0 4px 18px rgba(217,119,6,.35)}
+.cbtn.e{background:var(--eg);box-shadow:0 4px 18px rgba(15,118,110,.35)}
+
+/* result card */
+.rcard{border-radius:20px;padding:16px;margin-bottom:12px}
+.rcard.p{background:linear-gradient(135deg,rgba(109,40,217,.09),rgba(37,99,235,.09));border:1.5px solid rgba(109,40,217,.18)}
+.rcard.v{background:linear-gradient(135deg,rgba(217,119,6,.09),rgba(220,38,38,.09));border:1.5px solid rgba(217,119,6,.2)}
+.rcard.e{background:linear-gradient(135deg,rgba(15,118,110,.09),rgba(3,105,161,.09));border:1.5px solid rgba(15,118,110,.18)}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(120,80,240,0.07)}
+.rrow:last-child{border-bottom:none}
+.rlbl{font-size:13.5px;color:var(--dim)}
+.rval{font-size:15px;font-weight:700;color:var(--text)}
+.rval.xl{font-size:25px;font-weight:800}
+.rval.pg{background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rval.vg{background:var(--vg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rval.eg{background:var(--eg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rval.grn{color:var(--grn)}
+.rval.red{color:var(--red)}
+.rval.gld{color:var(--gld)}
+.rval.pur{color:#6d28d9}
+
+/* section header */
+.sh{font-size:19px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:7px;letter-spacing:-.3px;color:var(--text)}
+
+/* pie */
+.pierow{display:flex;align-items:center;gap:18px;padding:4px 0}
+.pleg{flex:1}
+.pitem{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.pdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* land grid */
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.litem{background:#fff;border:1px solid var(--cb);border-radius:14px;padding:12px;box-shadow:var(--csh)}
+.litem.hi{background:linear-gradient(135deg,rgba(109,40,217,.07),rgba(37,99,235,.07));border-color:rgba(109,40,217,.2)}
+.lunit{font-size:11px;color:var(--dim);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.lval{font-size:16px;font-weight:800;word-break:break-all;line-height:1.2;color:var(--text)}
+
+/* PDF-style matrix table */
+.tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;border:1px solid var(--cb);box-shadow:var(--csh)}
+.ptbl{border-collapse:collapse;width:100%;min-width:620px;font-size:12px;background:#fff}
+.ptbl thead tr{background:linear-gradient(135deg,rgba(109,40,217,.08),rgba(37,99,235,.08))}
+.ptbl th{padding:9px 10px;font-weight:700;color:var(--p1);text-align:right;white-space:nowrap;border-bottom:2px solid rgba(109,40,217,.12)}
+.ptbl th:first-child{text-align:left;position:sticky;left:0;background:#edeaff}
+.ptbl td{padding:8px 10px;text-align:right;border-bottom:1px solid #f0eeff;color:var(--text);white-space:nowrap}
+.ptbl td.un{font-weight:700;text-align:left;color:var(--p1);position:sticky;left:0;background:#fff;border-right:1px solid rgba(109,40,217,.1)}
+.ptbl td.me{font-weight:800;color:#1e1040;background:#f5f2ff}
+.ptbl tr:last-child td{border-bottom:none}
+.ptbl tr:hover td{background:#faf8ff}
+.ptbl tr:hover td.un{background:#f0eeff}
+
+/* rate equivalents box */
+.reqbox{
+  background:linear-gradient(135deg,rgba(109,40,217,.06),rgba(37,99,235,.06));
+  border:1px solid rgba(109,40,217,.14);border-radius:12px;
+  padding:10px 13px;margin-top:5px;margin-bottom:10px;
+}
+.reqbox.vr{background:linear-gradient(135deg,rgba(217,119,6,.06),rgba(220,38,38,.06));border-color:rgba(217,119,6,.15)}
+.reqrow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(109,40,217,.07);font-size:12px}
+.reqrow:last-child{border-bottom:none}
+.reqrow span{color:var(--dim)}
+.reqrow strong{color:var(--p1);font-weight:700}
+.reqbox.vr .reqrow strong{color:#b45309}
+
+/* village note */
+.vilnote{
+  background:#fef3c7;border:1px solid rgba(217,119,6,.25);border-radius:12px;
+  padding:9px 13px;margin-bottom:11px;font-size:12px;color:#92400e;
+  display:flex;align-items:center;gap:7px;font-weight:500;
+}
+
+/* summary box */
+.sbox{background:#f5f2ff;border:1px solid rgba(109,40,217,.12);border-radius:14px;padding:13px;font-size:13px;color:var(--text);line-height:1.8;margin-bottom:12px}
+.sbox.v{background:#fef3c7;border-color:rgba(217,119,6,.18)}
+.sbox strong{color:#6d28d9}
+.sbox.v strong{color:#b45309}
+
+/* action row */
+.actrow{display:flex;gap:8px;margin-bottom:10px}
+.actbtn{flex:1;padding:11px 8px;background:#fff;border:1.5px solid var(--cb);border-radius:11px;color:var(--dim);font-size:12px;font-weight:600;cursor:pointer;transition:background .2s;text-align:center}
+.actbtn:active{background:#f5f2ff}
+
+/* amort */
+.togrow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;margin-bottom:10px}
+.toglbl{font-size:14px;color:var(--dim);font-weight:500}
+.tog{width:48px;height:28px;border-radius:14px;background:#e0d9ff;border:none;cursor:pointer;position:relative;transition:background .22s;flex-shrink:0}
+.tog::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .22s;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.tog.on{background:var(--p1)}
+.tog.on::after{transform:translateX(20px)}
+.amwrap{max-height:300px;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;border-radius:10px;background:#faf8ff}
+.amwrap::-webkit-scrollbar{width:3px}
+.amwrap::-webkit-scrollbar-thumb{background:rgba(109,40,217,.3);border-radius:2px}
+.at{width:100%;border-collapse:collapse;font-size:11.5px}
+.at th{background:#f0eeff;color:var(--p1);font-weight:700;text-align:right;padding:7px 7px;border-bottom:1.5px solid rgba(109,40,217,.1)}
+.at th:first-child{text-align:center}
+.at td{text-align:right;padding:6px 7px;border-bottom:1px solid #f0eeff;color:var(--text)}
+.at td:first-child{text-align:center;color:var(--dim)}
+.at tr:last-child td{border-bottom:none}
+.at tfoot tr td{
+  background:linear-gradient(135deg,rgba(109,40,217,.08),rgba(37,99,235,.05));
+  font-weight:700;font-size:12px;color:var(--text);
+  padding:8px 7px;border-top:1.5px solid rgba(109,40,217,.15);border-bottom:none;
+}
+.at tfoot tr td:first-child{color:var(--p1);text-align:center;font-size:11px;font-weight:800;letter-spacing:.3px}
+.at tfoot .tot-grn{color:var(--grn)}
+.at tfoot .tot-red{color:var(--red)}
+
+/* badge / info */
+.badge{display:inline-block;background:#ede9fe;border:1px solid rgba(109,40,217,.2);border-radius:8px;padding:3px 10px;font-size:11px;color:#6d28d9;font-weight:700;margin-top:6px}
+.info{font-size:11.5px;color:var(--dim);text-align:left;margin-top:-3px;margin-bottom:9px;font-style:italic}
+
+/* clear button */
+.clrbtn{
+  flex:none;width:44px;height:44px;border:1.5px solid var(--cb);border-radius:14px;
+  background:#fff;color:var(--dim);font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .18s,border-color .18s,color .18s,transform .12s;
+  flex-shrink:0;
+}
+.clrbtn:active{background:#fdf2f2;border-color:#fca5a5;color:var(--red);transform:scale(.93)}
+.clrbtn:hover{background:#fef2f2;border-color:#fca5a5;color:var(--red)}
+.btnrow{display:flex;gap:8px;align-items:stretch;margin-top:2px}
+.btnrow .cbtn{flex:1;margin-top:0}
+
+/* error */
+.err{color:var(--red);font-size:12px;margin-top:5px;display:block;font-weight:500}
+
+.hide{display:none!important}
+.div{height:1px;background:rgba(120,80,240,0.08);margin:8px 0}
+
+/* ── Land Price Calculator ── */
+.lp-result{
+  border-radius:16px;padding:14px 16px;margin-bottom:0;
+  background:linear-gradient(135deg,rgba(109,40,217,.08),rgba(37,99,235,.06));
+  border:1.5px solid rgba(109,40,217,.18);
+}
+.lp-total{font-size:27px;font-weight:800;letter-spacing:-.5px;
+  background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.15;margin-bottom:2px}
+.lp-sub{font-size:12px;color:var(--dim);margin-bottom:10px}
+.lp-row{display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-top:1px solid rgba(109,40,217,.08);font-size:13px}
+.lp-lbl{color:var(--dim)}
+.lp-val{font-weight:700;color:var(--text)}
+.lp-val.grn{color:var(--grn)}
+
+/* ── Loan Comparison ── */
+/* loan input cards grid */
+.lcmp-g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.lcmp-g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:12px}
+@media(max-width:480px){.lcmp-g2,.lcmp-g3{grid-template-columns:1fr}}
+
+/* loan input card */
+.lcard{
+  background:var(--card);border:1.5px solid var(--cb);border-radius:18px;
+  padding:13px 12px;box-shadow:var(--csh);position:relative;
+  transition:border-color .2s,box-shadow .2s;
+}
+.lcard.lc1{border-color:rgba(109,40,217,.28);box-shadow:0 2px 14px rgba(109,40,217,.10)}
+.lcard.lc2{border-color:rgba(5,150,105,.28);box-shadow:0 2px 14px rgba(5,150,105,.10)}
+.lcard.lc3{border-color:rgba(217,119,6,.28);box-shadow:0 2px 14px rgba(217,119,6,.10)}
+.lcard-head{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.lcard-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.lc1 .lcard-dot{background:#6d28d9}
+.lc2 .lcard-dot{background:#059669}
+.lc3 .lcard-dot{background:#d97706}
+.lcard-name{font-size:12px;font-weight:700;color:var(--text);flex:1;background:none;border:none;
+  outline:none;padding:0;font-family:inherit;cursor:text}
+.lcard-del{width:22px;height:22px;border:none;background:none;color:var(--subdim);
+  font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  border-radius:6px;transition:background .15s,color .15s;padding:0}
+.lcard-del:hover{background:#fee2e2;color:var(--red)}
+.lcard .ilbl{font-size:11px;color:var(--dim);margin-bottom:3px;font-weight:500}
+.lcard .if{font-size:13px;padding:8px 10px;border-radius:10px}
+.lcard .irow{gap:6px;margin-bottom:7px}
+.lcard .irow:last-child{margin-bottom:0}
+
+/* add loan button */
+.add-loan-btn{
+  width:100%;padding:11px;border:1.5px dashed rgba(109,40,217,.28);
+  border-radius:14px;background:rgba(109,40,217,.03);
+  color:var(--p1);font-size:13px;font-weight:600;cursor:pointer;
+  transition:background .18s,border-color .18s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-bottom:12px;
+}
+.add-loan-btn:hover{background:rgba(109,40,217,.07);border-color:rgba(109,40,217,.45)}
+.add-loan-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* compare button */
+.cbtn.cmp{background:var(--pg);box-shadow:0 4px 18px rgba(109,40,217,.38)}
+
+/* winner banner */
+.cmp-winner{
+  border-radius:16px;padding:14px 16px;margin-bottom:12px;
+  background:linear-gradient(135deg,rgba(5,150,105,.10),rgba(3,105,161,.08));
+  border:1.5px solid rgba(5,150,105,.28);
+}
+.cmp-winner-title{font-size:11px;font-weight:700;color:var(--grn);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.cmp-winner-val{font-size:19px;font-weight:800;color:var(--text);line-height:1.2}
+.cmp-winner-sub{font-size:12px;color:var(--dim);margin-top:3px}
+
+/* comparison table */
+.cmp-tbl-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--cb);margin-bottom:12px;box-shadow:var(--csh)}
+.cmp-tbl{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+.cmp-tbl th{padding:9px 10px;font-weight:700;color:var(--dim);text-align:right;
+  background:linear-gradient(135deg,rgba(109,40,217,.07),rgba(37,99,235,.05));
+  border-bottom:1.5px solid rgba(109,40,217,.10);font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+.cmp-tbl th:first-child{text-align:left}
+.cmp-tbl td{padding:9px 10px;text-align:right;border-bottom:1px solid #f0eeff;color:var(--text);white-space:nowrap}
+.cmp-tbl td:first-child{text-align:left;color:var(--dim);font-size:11.5px;font-weight:500}
+.cmp-tbl tr:last-child td{border-bottom:none}
+.cmp-tbl .best{font-weight:800}
+.cmp-tbl .lc1c{color:#6d28d9}
+.cmp-tbl .lc2c{color:#059669}
+.cmp-tbl .lc3c{color:#d97706}
+.cmp-tbl .worst{color:var(--red)}
+.cmp-tbl tr.hi-row td{background:rgba(5,150,105,.04)}
+
+/* bar charts */
+.cmp-chart-wrap{background:var(--card);border:1px solid var(--cb);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:var(--csh)}
+.cmp-chart-title{font-size:10.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.9px;margin-bottom:12px}
+.bar-group{margin-bottom:9px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.bar-name{font-size:11px;font-weight:600;color:var(--dim);width:54px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:9px;background:#ece8ff;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;transition:width .55s cubic-bezier(.4,0,.2,1)}
+.bf1{background:linear-gradient(90deg,#6d28d9,#4f46e5)}
+.bf2{background:linear-gradient(90deg,#059669,#0d9488)}
+.bf3{background:linear-gradient(90deg,#d97706,#dc2626)}
+.bar-val{font-size:11px;color:var(--dim);text-align:right;width:80px;flex-shrink:0;font-weight:600}
+.bar-section-lbl{font-size:11.5px;color:var(--text);font-weight:700;margin-bottom:7px;margin-top:4px}
+
+/* shared amount toggle */
+.share-row{display:flex;align-items:center;gap:9px;margin-bottom:11px;padding:10px 13px;
+  background:#f5f2ff;border:1px solid rgba(109,40,217,.12);border-radius:11px}
+.share-chk{width:17px;height:17px;accent-color:var(--p1);cursor:pointer;flex-shrink:0}
+.share-lbl{font-size:12.5px;color:var(--dim);font-weight:500;cursor:pointer;flex:1}
+/* ── Loan Ledger ── */
+.ldg-empty{text-align:center;padding:40px 20px;color:var(--dim);font-size:13px}
+.ldg-empty .ldg-ei{font-size:40px;margin-bottom:10px}
+.loan-card{background:var(--card);border:1.5px solid var(--cb);border-radius:20px;padding:14px 15px;margin-bottom:12px;box-shadow:var(--csh);position:relative}
+.loan-card.closed{opacity:.6;border-style:dashed}
+.loan-card.lender{border-color:rgba(5,150,105,.25);background:linear-gradient(135deg,#f0fdf4 0%,#fff 60%)}
+.loan-card.borrower{border-color:rgba(109,40,217,.18)}
+.loan-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.loan-name{font-size:16px;font-weight:800;color:var(--text);line-height:1.2}
+.loan-meta{font-size:11px;color:var(--dim);margin-top:2px}
+.loan-card-note{font-size:12px;color:#6d28d9;background:#f5f2ff;border-radius:8px;padding:5px 9px;margin-bottom:10px;font-style:italic}
+.loan-role-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-bottom:4px;display:inline-block}
+.loan-role-tag.borrower{background:#ede9fe;color:#6d28d9}
+.loan-role-tag.lender{background:#d1fae5;color:#059669}
+.loan-badge{display:inline-block;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.4px}
+.loan-badge.open{background:#ede9fe;color:#6d28d9}
+.loan-badge.closed{background:#d1fae5;color:#059669}
+.loan-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.loan-stat{background:#faf8ff;border:1px solid rgba(109,40,217,.08);border-radius:12px;padding:9px 11px}
+.loan-card.lender .loan-stat{background:#f0fdf4;border-color:rgba(5,150,105,.1)}
+.loan-stat-lbl{font-size:10px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.loan-stat-val{font-size:15px;font-weight:800;color:var(--text)}
+.loan-stat-val.red{color:var(--red)}
+.loan-stat-val.grn{color:var(--grn)}
+.loan-stat-val.gld{color:var(--gld)}
+.loan-actions{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.la-btn{flex:1;padding:9px 6px;border:none;border-radius:11px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;min-width:60px}
+.la-btn:active{opacity:.8;transform:scale(.97)}
+.la-btn.pay{background:linear-gradient(135deg,#0f766e,#0369a1);color:#fff}
+.la-btn.close{background:linear-gradient(135deg,#d97706,#dc2626);color:#fff}
+.la-btn.del{background:#fef2f2;color:var(--red);border:1.5px solid #fecaca}
+.la-btn.wa{background:#15803d;color:#fff}
+.la-btn.cp{background:#1d4ed8;color:#fff}
+.loan-hist-toggle{font-size:11px;color:var(--p1);font-weight:600;cursor:pointer;text-align:center;padding:4px 0;border-top:1px solid rgba(109,40,217,.07);margin-top:2px}
+.loan-hist{margin-top:10px;border-top:1px solid rgba(109,40,217,.07);padding-top:10px}
+.hist-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(109,40,217,.05);font-size:12px}
+.hist-row:last-child{border-bottom:none}
+.hist-type{font-weight:700;padding:2px 7px;border-radius:6px;font-size:10px;margin-bottom:2px;display:inline-block}
+.hist-type.interest{background:#dbeafe;color:#1d4ed8}
+.hist-type.full{background:#d1fae5;color:#059669}
+.hist-type.principal{background:#fef3c7;color:#b45309}
+.hist-type.borrow{background:#ede9fe;color:#6d28d9}
+.hist-date{color:var(--dim);font-size:10.5px;margin-top:1px}
+.hist-amt{font-weight:700;color:var(--text);text-align:right}
+.hist-note{font-size:10px;color:var(--dim);margin-top:1px;text-align:right}
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(20,10,60,.45);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.modal-overlay.hide{display:none}
+.modal{background:#fff;border-radius:24px 24px 0 0;padding:20px 18px 32px;width:100%;max-width:430px;box-shadow:0 -8px 40px rgba(109,40,217,.18)}
+.modal-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal .ig{margin-bottom:11px}
+.modal-btns{display:flex;gap:9px;margin-top:4px}
+.modal-btns .cbtn{margin-top:0}
+.ldg-toolbar{display:flex;gap:8px;margin-bottom:10px}
+.ldg-tb-btn{flex:1;padding:9px 6px;border:1.5px solid var(--cb);border-radius:11px;background:#fff;color:var(--dim);font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:background .15s}
+.ldg-tb-btn:active{background:#f5f2ff}
+.ldg-accrued{font-size:10px;color:var(--dim);margin-top:2px;font-weight:500}
+/* summary dashboard */
+.ldg-summary{background:linear-gradient(135deg,#1a1040,#0f172a);border-radius:18px;padding:14px 15px;margin-bottom:14px;color:#fff}
+.ldg-summary-title{font-size:12px;font-weight:700;color:#a78bfa;letter-spacing:.5px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.ldg-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ldg-sum-item{background:rgba(255,255,255,.07);border-radius:12px;padding:9px 11px}
+.ldg-sum-lbl{font-size:10px;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.ldg-sum-val{font-size:14px;font-weight:800;color:#fff}
+.ldg-sum-val.grn{color:#6ee7b7}
+.ldg-sum-val.red{color:#fca5a5}
+.ldg-sum-val.gld{color:#fcd34d}
+/* search & filter */
+.ldg-search{position:relative;margin-bottom:8px}
+.ldg-search input{width:100%;padding:10px 14px 10px 36px;border-radius:12px;border:1.5px solid var(--cb);background:#fff;font-size:13px;box-sizing:border-box;outline:none}
+.ldg-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+.ldg-filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.ldg-filter-btn{padding:5px 12px;border-radius:99px;border:1.5px solid var(--cb);background:#fff;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--dim);transition:all .15s}
+.ldg-filter-btn.on{background:var(--p1);color:#fff;border-color:var(--p1)}
+/* role toggle in modal */
+.role-toggle{display:flex;gap:0;border-radius:12px;overflow:hidden;border:1.5px solid var(--cb);margin-bottom:0}
+.role-btn{flex:1;padding:10px 6px;border:none;background:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+.role-btn.borrower.on{background:#6d28d9;color:#fff}
+.role-btn.lender.on{background:#059669;color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(12px)}}
+#toast{
+  position:fixed;bottom:calc(var(--tab) + 16px);left:50%;transform:translateX(-50%);
+  background:#1a1040;color:#fff;font-size:13px;font-weight:600;
+  padding:10px 20px;border-radius:99px;pointer-events:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.18);z-index:999;white-space:nowrap;
+  display:none;
+}
+#toast.show{display:block;animation:toastIn .22s cubic-bezier(.4,0,.2,1) forwards}
+#toast.hide-anim{display:block;animation:toastOut .22s cubic-bezier(.4,0,.2,1) forwards}
+
+/* ══════════════════════════════════════════════════════════
+   LEASE FINANCE PRO — light theme matching other tabs
+   ══════════════════════════════════════════════════════════ */
+#t-lease .lhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+#t-lease .lhdr-title{font-size:19px;font-weight:800;letter-spacing:-.3px;color:var(--text);display:flex;align-items:center;gap:7px}
+
+/* advance card */
+.adv-card{background:var(--bg2);border:1px solid rgba(109,40,217,.13);border-radius:14px;padding:11px;margin-top:8px}
+.adv-label{font-size:11px;color:var(--dim);font-weight:600;margin-bottom:4px;letter-spacing:.2px}
+.adv-del{width:34px;height:34px;border:1.5px solid rgba(220,38,38,.25);border-radius:10px;background:#fff;color:var(--red);font-size:13px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s}
+.adv-del:hover{background:#fee2e2;border-color:var(--red)}
+.add-adv-btn{width:100%;padding:10px;border:1.5px dashed rgba(109,40,217,.28);border-radius:12px;background:rgba(109,40,217,.03);color:var(--p1);font-size:13px;font-weight:600;cursor:pointer;transition:background .18s;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+.add-adv-btn:hover{background:rgba(109,40,217,.07)}
+
+/* lease result */
+.lease-result{background:linear-gradient(135deg,rgba(109,40,217,.07),rgba(37,99,235,.05));border:1.5px solid rgba(109,40,217,.16);border-radius:18px;padding:15px;margin-top:10px}
+.half-card{margin-top:10px}
+.lease-line{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(109,40,217,.07);font-size:13px}
+.lease-line:last-child{border-bottom:none}
+.lease-lbl{color:var(--dim);font-weight:500}
+.lease-val{font-weight:700;color:var(--text);text-align:right}
+.lease-final{display:flex;justify-content:space-between;align-items:center;padding:9px 0 3px;margin-top:4px;border-top:2px solid rgba(109,40,217,.16);font-size:15px;font-weight:800;color:var(--text)}
+.lease-final .lease-val{font-size:19px;background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lease-words{font-size:11px;color:var(--dim);margin-top:3px;font-style:italic;padding-bottom:4px}
+
+/* paid status */
+.paid-bar{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.paid-btn-row{display:flex;gap:8px}
+.paid-btn{flex:1;padding:11px 10px;border:1.5px solid rgba(109,40,217,.2);border-radius:12px;background:#fff;color:var(--dim);font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;text-align:center;min-height:44px}
+.paid-btn.paid{background:rgba(5,150,105,.09);border-color:rgba(5,150,105,.4);color:var(--grn)}
+.paid-btn.pending{background:rgba(109,40,217,.1);border-color:rgba(109,40,217,.5);color:var(--p1)}
+.paid-btn:active{transform:scale(.97)}
+.paid-date-row{display:flex;align-items:center;gap:6px;padding:9px 11px;background:var(--bg2);border-radius:11px;border:1px solid rgba(109,40,217,.12);flex-wrap:wrap}
+.paid-date-lbl{font-size:11px;color:var(--dim);font-weight:600;flex-shrink:0}
+.paid-confirm-btn{padding:8px 14px;background:var(--pg);color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;min-height:36px}
+.paid-cancel-btn{padding:8px 11px;background:#fff;color:var(--dim);border:1.5px solid var(--cb);border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;min-height:36px}
+/* EMI Tracker */
+.etk-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.etk-sum-card{background:var(--card);border:1px solid var(--cb);border-radius:14px;padding:11px 13px;box-shadow:var(--csh)}
+.etk-sum-val{font-size:22px;font-weight:800;color:var(--text);line-height:1.2}
+.etk-sum-lbl{font-size:10px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+.etk-toolbar{margin-bottom:12px}
+.etk-view-toggle{display:flex;gap:6px;margin-bottom:10px}
+.etk-view-btn{flex:1;padding:7px 0;border:1.5px solid var(--cb);border-radius:10px;background:var(--card);color:var(--dim);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.etk-view-btn.on{background:var(--p1);border-color:var(--p1);color:#fff}
+.etk-add-btn{width:100%;padding:11px 10px;background:var(--eg);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(15,118,110,.3)}
+.etk-bank-group{background:var(--card);border:1px solid var(--cb);border-radius:16px;margin-bottom:10px;overflow:hidden;box-shadow:var(--csh)}
+.etk-bank-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.etk-bank-name{font-size:13px;font-weight:800;color:var(--text)}
+.etk-bank-meta{font-size:11px;color:var(--dim);margin-top:2px}
+.etk-bank-chevron{font-size:11px;color:var(--dim);transition:transform .2s;display:inline-block}
+.etk-bank-chevron.open{transform:rotate(180deg)}
+.etk-bank-body{padding:0 12px 12px;border-top:1px solid var(--cb)}
+.etk-emi-card{background:var(--bg2);border-radius:12px;padding:11px 13px;margin-top:9px}
+.etk-emi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}
+.etk-emi-desc{font-size:13px;font-weight:700;color:var(--text)}
+.etk-emi-sublbl{font-size:10px;color:var(--dim);margin-top:2px}
+.etk-emi-amt{font-size:14px;font-weight:800;color:var(--p1);text-align:right}
+.etk-emi-amt-unit{font-size:10px;font-weight:500;color:var(--dim)}
+.etk-emi-amt-sub{font-size:10px;color:var(--dim);text-align:right;margin-top:1px}
+.etk-progress-wrap{height:6px;background:rgba(109,40,217,.1);border-radius:99px;margin:7px 0 5px}
+.etk-progress-bar{height:6px;border-radius:99px;background:var(--pg);transition:width .4s}
+.etk-progress-bar.done{background:linear-gradient(135deg,var(--grn),#34d399)}
+.etk-emi-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--dim)}
+.etk-emi-actions{display:flex;gap:6px;margin-top:8px}
+.etk-emi-edit{background:var(--plight);border:none;color:var(--p1);font-size:11px;font-weight:700;cursor:pointer;padding:5px 11px;border-radius:8px;min-height:30px}
+.etk-emi-del{background:#fee2e2;border:none;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;padding:5px 11px;border-radius:8px;min-height:30px}
+.etk-ending-soon{display:inline-block;background:#fef3c7;color:#b45309;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;border:1px solid rgba(180,83,9,.22);vertical-align:middle;margin-left:5px}
+
+/* EMI card theme picker */
+.etk-theme-toggle{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;-webkit-user-select:none;user-select:none}
+.etk-theme-toggle input{width:16px;height:16px;cursor:pointer;accent-color:var(--p1)}
+.etk-theme-body{margin-top:9px}
+.etk-theme-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.etk-preset-chip{display:flex;align-items:center;gap:5px;padding:5px 10px 5px 6px;border-radius:99px;border:1.5px solid var(--cb);background:#fff;cursor:pointer;font-size:10.5px;font-weight:600;color:var(--dim);transition:border-color .15s}
+.etk-preset-chip:active{border-color:var(--p1)}
+.etk-preset-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:1px solid rgba(0,0,0,.08)}
+.etk-theme-row{display:flex;gap:7px;align-items:center}
+.etk-theme-row+.etk-theme-row{margin-top:8px}
+input[type=color].etk-color-input{-webkit-appearance:none;appearance:none;width:44px;height:40px;min-height:40px;padding:2px;border:1.5px solid #ddd8f8;border-radius:10px;background:#faf8ff;cursor:pointer;flex-shrink:0}
+input[type=color].etk-color-input::-webkit-color-swatch-wrapper{padding:2px}
+input[type=color].etk-color-input::-webkit-color-swatch{border:none;border-radius:7px}
+.etk-mini-btn{padding:9px 13px;background:var(--eg);color:#fff;border:none;border-radius:10px;font-size:11.5px;font-weight:700;cursor:pointer;min-height:40px;white-space:nowrap;flex-shrink:0}
+.etk-theme-del{width:40px;height:40px;min-height:40px;border-radius:10px;border:1.5px solid var(--cb);background:#fff;color:var(--red);font-size:14px;cursor:pointer;flex-shrink:0}
+.etk-theme-preview{margin-top:9px;border-radius:11px;font-size:11.5px;font-weight:700;color:var(--text);overflow:hidden}
+
+/* Themed EMI card — solid bank-color "wallet card" look */
+.etk-emi-card-themed{color:#fff}
+.etk-emi-theme-strip{display:flex;align-items:center;gap:8px;margin:-11px -13px 9px;padding:7px 13px;border-radius:10.5px 10.5px 0 0}
+.etk-emi-badge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:22px;padding:0 6px;border-radius:7px;background:rgba(255,255,255,.92);font-size:10px;font-weight:800;letter-spacing:.3px;flex-shrink:0}
+.etk-emi-theme-bankname{font-size:11px;font-weight:700;color:rgba(255,255,255,.92);letter-spacing:.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.etk-emi-card-themed .etk-emi-desc{color:#fff}
+.etk-emi-card-themed .etk-emi-sublbl{color:rgba(255,255,255,.72)}
+.etk-emi-card-themed .etk-emi-amt{color:#fff}
+.etk-emi-card-themed .etk-emi-amt-unit{color:rgba(255,255,255,.75)}
+.etk-emi-card-themed .etk-emi-amt-sub{color:rgba(255,255,255,.78)}
+.etk-emi-card-themed .etk-emi-footer{color:rgba(255,255,255,.8)}
+.etk-emi-card-themed .etk-emi-footer span:last-child{color:#fff!important}
+.etk-emi-card-themed .etk-progress-wrap{background:rgba(255,255,255,.25)}
+.etk-emi-card-themed .etk-progress-bar{background:#fff}
+.etk-emi-card-themed .etk-progress-bar.done{background:#bbf7d0}
+.etk-emi-card-themed .etk-emi-edit{background:rgba(255,255,255,.2);color:#fff}
+.etk-emi-card-themed .etk-emi-del{background:rgba(255,255,255,.2);color:#fff}
+.etk-emi-card-themed .etk-ending-soon{background:rgba(255,255,255,.92);color:#92400e}
+
+/* interest toggle on advance */
+.adv-interest-lbl{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--dim);font-weight:500;padding:7px 9px;background:var(--bg2);border-radius:9px;border:1px solid rgba(109,40,217,.1);-webkit-user-select:none;user-select:none}
+.adv-interest-lbl input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--p1);flex-shrink:0}
+/* save/update dialog */
+#saveDialog{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center}
+#saveDialog.open{display:flex}
+#saveDialogPanel{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px));border-top:2px solid var(--cb)}
+
+/* stale overlay */
+#out.stale{opacity:.3;pointer-events:none}
+#staleNote{display:none;text-align:center;font-size:12px;color:var(--gld);margin-top:8px;font-weight:600;padding:8px 12px;background:#fef3c7;border-radius:10px;border:1px solid rgba(217,119,6,.2)}
+#out.stale+#staleNote{display:block}
+
+/* history button */
+#histBtn{background:#fff;border:1.5px solid var(--cb);color:var(--dim);font-size:12px;font-weight:700;padding:7px 12px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:var(--csh);flex-shrink:0}
+#histBtn span.badge{background:var(--p1);color:#fff;border-radius:99px;font-size:10px;padding:1px 6px;min-width:16px;text-align:center}
+
+/* history drawer — white panel */
+#histOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:300}
+#histOverlay.open{display:block}
+#histDrawer{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:430px;background:#fff;border-radius:20px 20px 0 0;border-top:2px solid var(--cb);z-index:301;padding:0 0 env(safe-area-inset-bottom,16px);max-height:85vh;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+#histDrawer.open{transform:translateX(-50%) translateY(0)}
+.hist-handle{width:36px;height:4px;background:rgba(120,80,240,.2);border-radius:99px;margin:12px auto 12px}
+.hist-head{display:flex;align-items:center;justify-content:space-between;padding:0 14px 10px;border-bottom:1px solid var(--cb);flex-shrink:0}
+.hist-title{font-size:15px;font-weight:800;color:var(--text)}
+.hist-close{background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px}
+.hist-clear{background:none;border:none;color:var(--p1);font-size:11px;font-weight:700;cursor:pointer;padding:4px 6px}
+.hist-clear.red{color:var(--red)}
+#histList{overflow-y:auto;padding:10px 14px;flex:1}
+.hitem{background:var(--bg2);border:1px solid var(--cb);border-radius:14px;padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.hitem:hover{border-color:rgba(109,40,217,.35);box-shadow:var(--csh)}
+.hitem-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.hitem-title{font-size:13px;font-weight:700;color:var(--text)}
+.hitem-date{font-size:10px;color:var(--dim);flex-shrink:0;padding-left:6px}
+.hitem-body{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:7px}
+.hitem-stat{font-size:11px;color:var(--dim)}
+.hitem-stat strong{color:var(--grn);font-weight:700}
+.hitem-actions{display:flex;gap:6px}
+.hitem-edit{background:var(--plight);border:none;color:var(--p1);font-size:11px;font-weight:700;cursor:pointer;padding:5px 11px;border-radius:8px;min-height:30px;transition:background .15s}
+.hitem-edit:hover{background:#ddd6fe}
+.hitem-del{background:#fef2f2;border:none;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;padding:5px 11px;border-radius:8px;min-height:30px;transition:background .15s}
+.hitem-del:hover{background:#fee2e2}
+.hist-paid-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-left:4px;background:#e0d9ff;vertical-align:middle}
+.hist-paid-dot.paid{background:var(--grn)}
+.hist-empty{text-align:center;color:var(--dim);font-size:13px;padding:32px 0}
+
+/* delete confirm toast */
+#delToast{position:fixed;bottom:calc(var(--tab) + env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%) translateY(20px);background:#fff;color:var(--text);border:1px solid var(--cb);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:500;box-shadow:0 4px 24px rgba(120,80,240,.15);z-index:400;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;max-width:90%}
+#delToast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#delToast .toast-cancel{background:var(--bg2);color:var(--dim);border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;min-height:32px}
+#delToast .toast-undo{background:var(--red);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;min-height:32px}
+
+@media print{
+  #histBtn,#histOverlay,#histDrawer,#delToast,.paid-bar,.add-adv-btn,#staleNote{display:none!important}
+  #t-lease .card,.actrow,.actbtn,.cbtn{display:none!important}
+  #out{display:block!important;opacity:1!important;pointer-events:auto!important}
+  .lease-result{background:#fff!important;border:1px solid #ccc!important;border-radius:0!important;break-inside:avoid;margin-top:12px}
+  .lease-line{border-bottom:1px solid #eee;color:#000}
+  .lease-final{border-top:2px solid #000}
+  .lease-words{color:#555}
+}
+</style>
+</head>
+<body>
+<div class="blobs"><div class="b b1"></div><div class="b b2"></div><div class="b b3"></div></div>
+
+<div class="app">
+  <div class="hdr">
+    <div class="hico">💎</div>
+    <div style="flex:1">
+      <div class="htitle">Finance Suite</div>
+      <div class="hsub">v1.9 · Land · Interest · EMI · Lease Finance</div>
+    </div>
+    <div style="display:flex;gap:5px;flex-shrink:0">
+      <button onclick="backupAll()" title="Backup all data to a file" style="background:#fff;border:1.5px solid var(--cb);border-radius:10px;padding:6px 9px;font-size:11px;font-weight:700;color:var(--dim);cursor:pointer;box-shadow:var(--csh);white-space:nowrap">⬇ Backup</button>
+      <button onclick="document.getElementById('restoreFile').click()" title="Restore from backup file" style="background:#fff;border:1.5px solid var(--cb);border-radius:10px;padding:6px 9px;font-size:11px;font-weight:700;color:var(--dim);cursor:pointer;box-shadow:var(--csh);white-space:nowrap">⬆ Restore</button>
+      <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreAll(this)">
+    </div>
+  </div>
+
+  <!-- ═══════════════ LAND TAB ═══════════════ -->
+  <div id="t-land" class="tab on">
+    <div class="sh">🏡 Land Converter</div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+        <div class="ct" style="margin-bottom:0">Enter Value &amp; From Unit</div>
+        <button class="clrbtn" style="width:32px;height:32px;font-size:15px;border-radius:10px;flex-shrink:0" onclick="clearLand()" title="Clear">🗑️</button>
+      </div>
+      <div class="irow">
+        <div class="ig" style="flex:2">
+          <div class="ilbl">Area Value</div>
+          <input type="number" id="lv" class="if" style="font-size:22px;font-weight:800" placeholder="0" inputmode="decimal" oninput="doLand()">
+        </div>
+        <div class="ig" style="flex:1.8">
+          <div class="ilbl">From Unit</div>
+          <select id="lf" class="if" onchange="doLand()">
+            <option value="marla">Marla</option>
+            <option value="kanal">Kanal</option>
+            <option value="biswa">Biswa</option>
+            <option value="bigha">Bigha</option>
+            <option value="acre">Acre / Killa</option>
+            <option value="sqft">Square Feet</option>
+            <option value="sqyd">Sq Yard / Gaj</option>
+            <option value="sqm">Square Meter</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="lgrid" class="lgrid"></div>
+
+    <!-- Land Price Calculator -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+        <div class="ct" style="margin-bottom:0">💰 Land Price Calculator</div>
+        <button class="clrbtn" style="width:32px;height:32px;font-size:15px;border-radius:10px;flex-shrink:0" onclick="clearLandPrice()" title="Clear">🗑️</button>
+      </div>
+
+      <!-- Rate per unit row -->
+      <div class="irow">
+        <div class="ig" style="flex:2">
+          <div class="ilbl">Rate per Unit (₹)</div>
+          <div class="bwrap" style="margin-bottom:0">
+            <span class="pre" style="font-size:16px;font-weight:700">₹</span>
+            <input type="number" id="lprate" class="if" style="font-size:18px;font-weight:700;padding-left:28px"
+              placeholder="0" inputmode="decimal" oninput="calcLandPrice()">
+          </div>
+        </div>
+        <div class="ig" style="flex:1.6">
+          <div class="ilbl">Rate Unit</div>
+          <select id="lprunit" class="if" onchange="calcLandPrice()">
+            <option value="marla">per Marla</option>
+            <option value="kanal">per Kanal</option>
+            <option value="biswa">per Biswa</option>
+            <option value="bigha">per Bigha</option>
+            <option value="acre">per Acre</option>
+            <option value="sqft">per Sq Ft</option>
+            <option value="sqyd">per Sq Yd</option>
+            <option value="sqm">per Sq M</option>
+          </select>
+        </div>
+      </div>
+
+      <span id="lperr" class="err hide"></span>
+
+      <!-- Live result -->
+      <div id="lpres" class="lp-result hide">
+        <div class="lp-total" id="lptotal">₹0</div>
+        <div class="lp-sub" id="lpsub">—</div>
+        <div class="lp-row">
+          <span class="lp-lbl">Area</span>
+          <span class="lp-val" id="lparea">—</span>
+        </div>
+        <div class="lp-row">
+          <span class="lp-lbl">Rate</span>
+          <span class="lp-val" id="lpprate">—</span>
+        </div>
+        <div class="lp-row">
+          <span class="lp-lbl">Per Sq Ft</span>
+          <span class="lp-val grn" id="lppersqft">—</span>
+        </div>
+        <div class="lp-row">
+          <span class="lp-lbl">Per Sq Yd</span>
+          <span class="lp-val grn" id="lppersqyd">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="padding:14px 0 0">
+      <div class="ct" style="padding:0 14px">Quick Reference (same as PDF)</div>
+      <div class="tblwrap">
+        <table class="ptbl">
+          <thead>
+            <tr>
+              <th>Unit</th><th>Marla</th><th>Kanal</th><th>Biswa</th>
+              <th>Bigha</th><th>Acre</th><th>Sq Ft</th><th>Sq Yd</th><th>Sq M</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="un">1 Marla</td>
+              <td class="me">1</td><td>1/20</td><td>3/5</td>
+              <td>1/33⅓</td><td>1/160</td><td>272.25</td><td>30.25</td><td>25.29</td>
+            </tr>
+            <tr>
+              <td class="un">1 Kanal</td>
+              <td>20</td><td class="me">1</td><td>12</td>
+              <td>3/5</td><td>1/8</td><td>5,445</td><td>605</td><td>505.86</td>
+            </tr>
+            <tr>
+              <td class="un">1 Biswa</td>
+              <td>1⅔</td><td>1/12</td><td class="me">1</td>
+              <td>1/20</td><td>1/96</td><td>453.75</td><td>50.42</td><td>42.16</td>
+            </tr>
+            <tr>
+              <td class="un">1 Bigha</td>
+              <td>33⅓</td><td>1⅔</td><td>20</td>
+              <td class="me">1</td><td>1/4.8</td><td>9,075</td><td>1,008⅓</td><td>843.1</td>
+            </tr>
+            <tr>
+              <td class="un">1 Acre</td>
+              <td>160</td><td>8</td><td>96</td>
+              <td>4.8</td><td class="me">1</td><td>43,560</td><td>4,840</td><td>4,046.9</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="padding:10px 14px;font-size:11px;color:var(--dim)">
+        1 Karm = 5.5 ft · 1 Marla = 9 sq karm (9 × 5.5² = 272.25 sq ft) · 1 Gaj = 1 Sq Yd = 9 sq ft
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ INTEREST TAB ═══════════════ -->
+  <div id="t-int" class="tab">
+    <div class="sh">💰 Interest Calculator</div>
+
+    <!-- Mode -->
+    <div class="seg">
+      <button class="sb on" onclick="setIM('std',this)">📐 Standard</button>
+      <button class="sb vl" onclick="setIM('vil',this)">🏘️ Village / Desi</button>
+    </div>
+    <div id="stdnote" class="vilnote" style="background:#ede9fe;border-color:rgba(109,40,217,.2);color:#4c1d95">
+      📐 <strong>30.44 days = 1 month · 365 days = 1 year</strong>
+    </div>
+    <div id="vilnote" class="vilnote hide">
+      🏘️ Village method: <strong>30 days = 1 month · 360 days = 1 year</strong>
+    </div>
+
+    <!-- Principal -->
+    <div class="card">
+      <div class="ct">Principal Amount</div>
+      <div class="bwrap">
+        <span class="pre">₹</span>
+        <input type="text" id="ip" class="if biginput" placeholder="0" inputmode="numeric" oninput="fmtRate(this)">
+      </div>
+    </div>
+
+    <!-- Rate -->
+    <div class="card">
+      <div class="ct">Interest Rate</div>
+      <!-- Main rate type -->
+      <div class="seg" id="rtSeg">
+        <button class="sb on" data-v="rs100" onclick="setRT(this)">₹ per ₹100</button>
+        <button class="sb" data-v="pct" onclick="setRT(this)">% Rate</button>
+      </div>
+      <!-- Sub: ₹/₹100 period -->
+      <div class="seg" id="rpRs">
+        <button class="sb on" data-v="pm" onclick="setRP(this)">Per Month</button>
+        <button class="sb" data-v="py" onclick="setRP(this)">Per Year</button>
+        <button class="sb" data-v="pd" onclick="setRP(this)">Per Day</button>
+      </div>
+      <!-- Sub: % period -->
+      <div class="seg hide" id="rpPct">
+        <button class="sb on" data-v="pa" onclick="setRP(this)">Per Annum</button>
+        <button class="sb" data-v="pm" onclick="setRP(this)">Per Month</button>
+      </div>
+      <!-- Rate input -->
+      <div class="irow" style="margin-bottom:0">
+        <div class="ig">
+          <div class="ilbl" id="rlbl">₹ per ₹100 Per Month</div>
+          <input type="number" id="ir" class="if" placeholder="0.00" inputmode="decimal"
+                 step="0.01" min="0" oninput="updReq()">
+        </div>
+      </div>
+      <!-- Live rate equivalents -->
+      <div id="reqbox" class="reqbox hide">
+        <div class="reqrow"><span>Monthly %</span><strong id="req_mth_pct">—</strong></div>
+        <div class="reqrow"><span>Annual %</span><strong id="req_ann_pct">—</strong></div>
+        <div class="reqrow"><span>₹ per ₹100 / month</span><strong id="req_rs_mth">—</strong></div>
+        <div class="reqrow"><span>₹ per ₹100 / year</span><strong id="req_rs_yr">—</strong></div>
+      </div>
+    </div>
+
+    <!-- Time -->
+    <div class="card">
+      <div class="ct">Time Period</div>
+      <div class="seg">
+        <button class="sb on" onclick="setTM('dur',this)">Duration</button>
+        <button class="sb" onclick="setTM('dt',this)">Date Range</button>
+      </div>
+      <div id="durSec">
+        <div class="irow">
+          <div class="ig" style="flex:2">
+            <div class="ilbl">Period</div>
+            <input type="number" id="iperiod" class="if" placeholder="0" inputmode="decimal" min="0" step="0.5">
+          </div>
+          <div class="ig" style="flex:1.5">
+            <div class="ilbl">Unit</div>
+            <select id="iunit" class="if">
+              <option value="d">Days</option>
+              <option value="m">Months</option>
+              <option value="y">Years</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="dtSec" class="hide">
+        <div class="irow">
+          <div class="ig">
+            <div class="ilbl">From Date</div>
+            <input type="date" id="isd" class="if" onchange="updDD()">
+          </div>
+          <div class="ig">
+            <div class="ilbl">To Date <span style="font-weight:400">(blank = today)</span></div>
+            <input type="date" id="ied" class="if" onchange="updDD()">
+          </div>
+        </div>
+        <div id="ddbadge" class="hide"><span class="badge" id="ddtxt">—</span></div>
+      </div>
+    </div>
+
+    <!-- Interest Type -->
+    <div class="card">
+      <div class="ct">Interest Type</div>
+      <div class="seg">
+        <button class="sb on" onclick="setIT('si',this)">Simple (Baru Vaddi)</button>
+        <button class="sb" onclick="setIT('ci',this)">Compound (Chakra Vaddi)</button>
+      </div>
+      <div id="cmpOpts" class="hide">
+        <div class="ilbl" style="margin-bottom:7px">Compounding Frequency</div>
+        <div class="seg" id="cfSeg">
+          <button class="sb" data-n="365" onclick="setCF(this)">Daily</button>
+          <button class="sb on" data-n="12" onclick="setCF(this)">Monthly</button>
+          <button class="sb" data-n="4" onclick="setCF(this)">Quarterly</button>
+          <button class="sb" data-n="2" onclick="setCF(this)">Half-Yr</button>
+          <button class="sb" data-n="1" onclick="setCF(this)">Yearly</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="btnrow">
+      <button id="icbtn" class="cbtn p" onclick="calcInt()">Calculate Interest →</button>
+      <button class="clrbtn" onclick="clearInt()" title="Clear / Reset">🗑️</button>
+    </div>
+    <span id="ierr" class="err hide"></span>
+
+    <!-- Interest Result -->
+    <div id="ires" class="hide">
+      <div id="ircard" class="rcard p">
+        <div class="rrow"><span class="rlbl">Principal</span><span class="rval" id="rip">₹0</span></div>
+        <div class="rrow"><span class="rlbl">Interest Amount</span><span class="rval grn" id="rii">₹0</span></div>
+        <div class="rrow"><span class="rlbl">Total Amount</span><span id="rit" class="rval xl pg">₹0</span></div>
+        <div class="rrow"><span class="rlbl">Rate p.a.</span><span class="rval gld" id="rira">0%</span></div>
+        <div class="rrow" id="effrow"><span class="rlbl">Effective Rate p.a.</span><span class="rval pur" id="rieff">0%</span></div>
+        <div class="rrow"><span class="rlbl">Period</span><span class="rval" id="riperiod">—</span></div>
+        <div class="rrow"><span class="rlbl">Monthly Interest</span><span class="rval" id="rimth" style="font-size:12.5px">—</span></div>
+        <div class="rrow"><span class="rlbl">Daily Interest</span><span class="rval" id="ridly" style="font-size:12.5px">—</span></div>
+      </div>
+      <div class="card">
+        <div class="pierow">
+          <canvas id="ipie" width="110" height="110"></canvas>
+          <div class="pleg">
+            <div class="pitem">
+              <div class="pdot" style="background:#6d28d9"></div>
+              <div><div style="font-size:11px;color:var(--dim)">Principal</div><div id="ipp" style="font-weight:800;font-size:15px">0%</div></div>
+            </div>
+            <div class="pitem">
+              <div class="pdot" style="background:#059669"></div>
+              <div><div style="font-size:11px;color:var(--dim)">Interest</div><div id="ipi" style="font-weight:800;font-size:15px">0%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sbox" id="isum"></div>
+      <div class="actrow">
+        <button class="actbtn" onclick="shareRes('int')">📤 Share</button>
+        <button class="actbtn" onclick="copyRes('int')">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ EMI TAB ═══════════════ -->
+  <div id="t-emi" class="tab">
+    <div class="seg eseg" style="margin-bottom:14px">
+      <button class="sb em on" id="emi-tab-calc" onclick="etkSwitchTab('calc')">📊 Calculator</button>
+      <button class="sb em" id="emi-tab-tracker" onclick="etkSwitchTab('tracker')">💳 My EMIs</button>
+    </div>
+    <div id="emi-calc-section">
+    <div class="sh">📊 EMI Calculator</div>
+
+    <div class="card">
+      <div class="ct">Loan Amount</div>
+      <div class="bwrap">
+        <span class="pre">₹</span>
+        <input type="text" id="ep" class="if biginput" placeholder="0" inputmode="numeric" oninput="fmtRate(this)">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">Interest Rate &amp; Loan Tenure</div>
+      <div class="irow">
+        <div class="ig">
+          <div class="ilbl">Annual Interest Rate (%)</div>
+          <div style="position:relative">
+            <input type="number" id="er" class="if" placeholder="e.g. 12" inputmode="decimal" step="0.01" min="0" style="padding-right:44px" oninput="syncEMIRate('annual')">
+            <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:12px;font-weight:600;pointer-events:none">% p.a.</span>
+          </div>
+        </div>
+        <div class="ig">
+          <div class="ilbl">Monthly Interest Rate (%)</div>
+          <div style="position:relative">
+            <input type="number" id="er_mth" class="if" placeholder="e.g. 1" inputmode="decimal" step="0.001" min="0" style="padding-right:44px" oninput="syncEMIRate('monthly')">
+            <span style="position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:12px;font-weight:600;pointer-events:none">% p.m.</span>
+          </div>
+        </div>
+      </div>
+      <div class="irow" style="margin-bottom:4px">
+        <div class="ig" style="flex:2">
+          <div class="ilbl">Loan Tenure</div>
+          <input type="number" id="et" class="if" placeholder="e.g. 24" inputmode="numeric" min="1" oninput="updET()">
+        </div>
+        <div class="ig" style="flex:1.4">
+          <div class="ilbl">Unit</div>
+          <select id="eunit" class="if" onchange="updET()">
+            <option value="m">Months</option>
+            <option value="y">Years</option>
+          </select>
+        </div>
+      </div>
+      <div id="etinfo" class="info hide"></div>
+    </div>
+
+    <div class="btnrow">
+      <button class="cbtn e" onclick="calcEMI()">Calculate EMI →</button>
+      <button class="clrbtn" onclick="clearEMI()" title="Clear / Reset">🗑️</button>
+    </div>
+    <span id="eerr" class="err hide"></span>
+
+    <div id="eres" class="hide">
+      <div class="rcard e">
+        <div class="rrow"><span class="rlbl">Monthly EMI</span><span id="eemi" class="rval xl eg">₹0</span></div>
+        <div class="rrow"><span class="rlbl">Interest Rate (Annual)</span><span id="erate_ann" class="rval gld">0% p.a.</span></div>
+        <div class="rrow"><span class="rlbl">Interest Rate (Monthly)</span><span id="erate_mth" class="rval pur">0% p.m.</span></div>
+        <div class="rrow"><span class="rlbl">Loan Amount</span><span id="eprin" class="rval">₹0</span></div>
+        <div class="rrow"><span class="rlbl">Total Interest</span><span id="eint" class="rval red">₹0</span></div>
+        <div class="rrow"><span class="rlbl">Total Payment</span><span id="etot" class="rval gld">₹0</span></div>
+        <div class="rrow"><span class="rlbl">Interest as % of Loan</span><span id="eipct" class="rval pur">0%</span></div>
+        <div class="rrow"><span class="rlbl">Avg Monthly Interest</span><span id="eavg" class="rval" style="font-size:12.5px">—</span></div>
+      </div>
+
+      <div class="card">
+        <div class="pierow">
+          <canvas id="epie" width="110" height="110"></canvas>
+          <div class="pleg">
+            <div class="pitem">
+              <div class="pdot" style="background:#0f766e"></div>
+              <div><div style="font-size:11px;color:var(--dim)">Principal</div><div id="epp" style="font-weight:800;font-size:15px">0%</div></div>
+            </div>
+            <div class="pitem">
+              <div class="pdot" style="background:#dc2626"></div>
+              <div><div style="font-size:11px;color:var(--dim)">Interest</div><div id="eip" style="font-weight:800;font-size:15px">0%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="togrow">
+          <span class="toglbl">📋 Amortization Schedule</span>
+          <div class="tog" id="amtog" onclick="togAm()"></div>
+        </div>
+        <div id="amsec" class="hide">
+          <div class="amwrap">
+            <table class="at">
+              <thead><tr><th>#</th><th>EMI ₹</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead>
+              <tbody id="ambd"></tbody>
+              <tfoot id="amtfoot"></tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="actrow">
+        <button class="actbtn" onclick="shareRes('emi')">📤 Share</button>
+        <button class="actbtn" onclick="copyRes('emi')">📋 Copy</button>
+      </div>
+    </div>
+
+    </div><!-- /emi-calc-section -->
+    <div id="emi-tracker-section" style="display:none">
+    <div id="etk-summary" class="etk-summary"></div>
+    <div class="etk-view-toggle">
+      <button class="etk-view-btn on" id="etkv-bank" onclick="etkSetView('bank')">🏦 By Bank</button>
+      <button class="etk-view-btn" id="etkv-close" onclick="etkSetView('close')">⏳ By Close Date</button>
+    </div>
+    <div class="etk-toolbar">
+      <button class="etk-add-btn" onclick="etkOpenAdd()">＋ Add EMI</button>
+    </div>
+    <div id="etk-groups"></div>
+    </div><!-- /emi-tracker-section -->
+  </div>
+
+  <!-- ═══════════════ LOAN COMPARISON TAB ═══════════════ -->
+  <div id="t-cmp" class="tab">
+    <div class="sh">⚖️ Loan Comparison</div>
+
+    <!-- Shared amount toggle -->
+    <div class="share-row">
+      <input type="checkbox" id="shareAmt" class="share-chk" checked onchange="toggleShareAmt()">
+      <label for="shareAmt" class="share-lbl">Same loan amount for all</label>
+    </div>
+
+    <!-- Shared amount input (shown when checkbox on) -->
+    <div id="sharedAmtCard" class="card" style="margin-bottom:12px">
+      <div class="ct">Loan Amount (shared)</div>
+      <div class="bwrap">
+        <span class="pre">₹</span>
+        <input type="text" id="cSharedAmt" class="if biginput" placeholder="0" inputmode="numeric" oninput="fmtRate(this)">
+      </div>
+    </div>
+
+    <!-- Loan cards container -->
+    <div id="loanCardsWrap"></div>
+
+    <!-- Add loan button -->
+    <button class="add-loan-btn" id="addLoanBtn" onclick="addLoanCard()">＋ Add 3rd Loan</button>
+
+    <!-- Compare button -->
+    <div class="btnrow">
+      <button class="cbtn cmp" onclick="calcCompare()">Compare Loans →</button>
+      <button class="clrbtn" onclick="clearCmp()" title="Clear">🗑️</button>
+    </div>
+    <span id="cmperr" class="err hide"></span>
+
+    <!-- Results -->
+    <div id="cmpres" class="hide">
+
+      <!-- Winner banner -->
+      <div class="cmp-winner">
+        <div class="cmp-winner-title">🏆 Best Deal</div>
+        <div class="cmp-winner-val" id="cmpWinnerName">—</div>
+        <div class="cmp-winner-sub" id="cmpWinnerSub">—</div>
+      </div>
+
+      <!-- Comparison table -->
+      <div class="cmp-tbl-wrap">
+        <table class="cmp-tbl" id="cmpTbl">
+          <thead id="cmpTblHead"></thead>
+          <tbody id="cmpTblBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Bar charts -->
+      <div class="cmp-chart-wrap">
+        <div class="cmp-chart-title">Visual Comparison</div>
+        <div class="bar-section-lbl">Monthly EMI</div>
+        <div id="barsEmi"></div>
+        <div class="bar-section-lbl" style="margin-top:12px">Total Interest Paid</div>
+        <div id="barsInt"></div>
+        <div class="bar-section-lbl" style="margin-top:12px">Total Payment</div>
+        <div id="barsTot"></div>
+      </div>
+
+      <!-- Savings callout -->
+      <div id="cmpSavings" class="rcard p" style="margin-bottom:12px">
+        <div class="rrow"><span class="rlbl">Best vs Worst — Interest saved</span><span class="rval grn" id="cmpSavInt">—</span></div>
+        <div class="rrow"><span class="rlbl">Best vs Worst — EMI saved / month</span><span class="rval grn" id="cmpSavEmi">—</span></div>
+        <div class="rrow"><span class="rlbl">Best vs Worst — Total saved</span><span class="rval grn" id="cmpSavTot">—</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════ LOAN LEDGER TAB ═══════════════ -->
+  <div id="t-ldg" class="tab">
+    <div class="sh">📒 Loan Ledger</div>
+
+    <!-- Summary Dashboard -->
+    <div class="ldg-summary" id="ldgSummary">
+      <div class="ldg-summary-title" onclick="toggleSummary()">
+        <span>📊 Summary</span><span id="ldgSummaryToggle">▲</span>
+      </div>
+      <div id="ldgSummaryBody" class="ldg-summary-grid">
+        <div class="ldg-sum-item"><div class="ldg-sum-lbl">I Owe (Outstanding)</div><div class="ldg-sum-val red" id="sOwes">₹0</div></div>
+        <div class="ldg-sum-item"><div class="ldg-sum-lbl">Owed to Me</div><div class="ldg-sum-val grn" id="sOwed">₹0</div></div>
+        <div class="ldg-sum-item"><div class="ldg-sum-lbl">Total Borrowed</div><div class="ldg-sum-val" id="sBorrowed">₹0</div></div>
+        <div class="ldg-sum-item"><div class="ldg-sum-lbl">Total Lent</div><div class="ldg-sum-val" id="sLent">₹0</div></div>
+        <div class="ldg-sum-item"><div class="ldg-sum-lbl">Interest Paid</div><div class="ldg-sum-val gld" id="sIntPaid">₹0</div></div>
+        <div class="ldg-sum-item"><div class="ldg-sum-lbl">Interest Received</div><div class="ldg-sum-val gld" id="sIntRcvd">₹0</div></div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="ldg-toolbar">
+      <button class="ldg-tb-btn" style="background:var(--pg);color:#fff;border:none;flex:2" onclick="openAddModal()">＋ Add Loan</button>
+      <button class="ldg-tb-btn" onclick="ldgImport()">⬆ Import</button>
+      <button class="ldg-tb-btn" onclick="ldgExport()">⬇ Export</button>
+    </div>
+    <input type="file" id="ldgImportFile" accept=".json" style="display:none" onchange="ldgImportFile(this)">
+
+    <!-- Search -->
+    <div class="ldg-search">
+      <span class="ldg-search-icon">🔍</span>
+      <input type="text" id="ldgSearch" placeholder="Search by name…" oninput="ldgRender()">
+    </div>
+
+    <!-- Filters -->
+    <div class="ldg-filters">
+      <button class="ldg-filter-btn on" data-f="all"     onclick="ldgSetFilter(this)">All</button>
+      <button class="ldg-filter-btn"    data-f="open"    onclick="ldgSetFilter(this)">Open</button>
+      <button class="ldg-filter-btn"    data-f="closed"  onclick="ldgSetFilter(this)">Closed</button>
+      <button class="ldg-filter-btn"    data-f="borrower" onclick="ldgSetFilter(this)">I Borrowed</button>
+      <button class="ldg-filter-btn"    data-f="lender"  onclick="ldgSetFilter(this)">I Lent</button>
+    </div>
+
+    <!-- Loan list -->
+    <div id="ldgList"></div>
+  </div>
+
+  <!-- ADD LOAN MODAL -->
+  <div class="modal-overlay hide" id="addModal">
+    <div class="modal">
+      <div class="modal-title" id="ml-title">➕ New Loan</div>
+      <input type="hidden" id="ml-editid" value="">
+      <div class="ig">
+        <div class="ilbl">I am the…</div>
+        <div class="role-toggle">
+          <button class="role-btn borrower on" id="ml-role-borrower" onclick="setLoanRole('borrower')">🙋 Borrower (I took)</button>
+          <button class="role-btn lender"      id="ml-role-lender"   onclick="setLoanRole('lender')">🤝 Lender (I gave)</button>
+        </div>
+      </div>
+      <div class="ig">
+        <div class="ilbl" id="ml-namelbl">Lender Name</div>
+        <input type="text" id="ml-name" class="if" placeholder="e.g. Ramesh Ji">
+      </div>
+      <div class="ig">
+        <div class="ilbl">Principal Amount (₹)</div>
+        <input type="text" id="ml-amt" class="if" placeholder="0" inputmode="numeric" oninput="ldgFmtInput(this)">
+      </div>
+      <div class="ig">
+        <div class="ilbl" id="ml-datelbl">Borrow Date</div>
+        <input type="date" id="ml-date" class="if">
+      </div>
+      <div class="ig">
+        <div class="ilbl">Interest Rate Type</div>
+        <select id="ml-rtype" class="if" onchange="updMlRlbl()">
+          <option value="rs100">₹ per ₹100 per Month</option>
+          <option value="pct">% Per Annum</option>
+          <option value="pctm">% Per Month</option>
+        </select>
+      </div>
+      <div class="ig">
+        <div class="ilbl" id="ml-rlbl">Rate (₹ per ₹100 / month)</div>
+        <input type="number" id="ml-rate" class="if" placeholder="0.00" step="0.01" inputmode="decimal">
+      </div>
+      <div class="ig">
+        <div class="ilbl">Purpose / Note <span style="font-weight:400;color:var(--dim)">— shown on card</span></div>
+        <input type="text" id="ml-note" class="if" placeholder="e.g. Borrowed for tractor repair">
+      </div>
+      <span id="ml-err" class="err hide"></span>
+      <div class="modal-btns">
+        <button class="cbtn p" id="ml-savebtn" onclick="saveLoan()">Save Loan</button>
+        <button class="cbtn" style="background:#e5e7eb;color:#374151;box-shadow:none;flex:0.4" onclick="closeAddModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAY INTEREST MODAL -->
+  <div class="modal-overlay hide" id="payModal">
+    <div class="modal">
+      <div class="modal-title">💸 Record Payment</div>
+      <input type="hidden" id="pm-id">
+      <div class="ig">
+        <div class="ilbl">Payment Type</div>
+        <div class="seg" style="margin-bottom:0">
+          <button class="sb on" id="pm-t-int" onclick="setPmType('interest',this)">Interest Only</button>
+          <button class="sb" id="pm-t-full" onclick="setPmType('full',this)">Full Closure</button>
+        </div>
+      </div>
+      <div class="ig">
+        <div class="ilbl">Payment Date</div>
+        <input type="date" id="pm-date" class="if">
+      </div>
+      <div class="ig" id="pm-accrued-row">
+        <div class="ilbl">Accrued Interest (calculated)</div>
+        <input type="number" id="pm-int" class="if" placeholder="0" inputmode="decimal" readonly style="background:#f5f2ff">
+        <div class="ldg-accrued" id="pm-accrued-note"></div>
+      </div>
+      <div class="ig" id="pm-extraprincipal-row">
+        <div class="ilbl">Extra Against Principal (₹) <span style="font-weight:400;color:var(--dim)">— optional</span></div>
+        <input type="number" id="pm-extraprincipal" class="if" placeholder="0" inputmode="decimal" oninput="ldgRefreshPayCalc()">
+        <div class="ldg-accrued" id="pm-principal-after"></div>
+      </div>
+      <div class="ig" id="pm-principal-row" style="display:none">
+        <div class="ilbl">Principal Outstanding</div>
+        <input type="number" id="pm-principal" class="if" placeholder="0" inputmode="decimal" readonly style="background:#f5f2ff">
+      </div>
+      <div class="ig">
+        <div class="ilbl">Total Amount Paid (₹)</div>
+        <input type="number" id="pm-amt" class="if" placeholder="0" inputmode="decimal" readonly style="background:#f5f2ff">
+      </div>
+      <div class="ig">
+        <div class="ilbl">Note (optional)</div>
+        <input type="text" id="pm-note" class="if" placeholder="e.g. Paid by cash">
+      </div>
+      <span id="pm-err" class="err hide"></span>
+      <div class="modal-btns">
+        <button class="cbtn e" onclick="savePayment()">Record Payment</button>
+        <button class="cbtn" style="background:#e5e7eb;color:#374151;box-shadow:none;flex:0.4" onclick="closePayModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ETK ADD/EDIT MODAL -->
+  <div class="modal-overlay hide" id="etkModal">
+    <div class="modal">
+      <div class="modal-title" id="etk-modal-title">➕ Add EMI</div>
+      <input type="hidden" id="etk-edit-id">
+      <div class="ig">
+        <div class="ilbl">Bank Name</div>
+        <input type="text" id="etk-bank" class="if" placeholder="e.g. HDFC, SBI, ICICI" list="etk-bank-list" oninput="etkOnBankInput()">
+        <datalist id="etk-bank-list"></datalist>
+      </div>
+      <div class="ig">
+        <div class="ilbl">Card Label <span style="font-weight:400;color:var(--dim)">— optional</span></div>
+        <input type="text" id="etk-card" class="if" placeholder="e.g. Millennia, Cashback">
+      </div>
+      <div class="ig">
+        <div class="ilbl">Description</div>
+        <input type="text" id="etk-desc" class="if" placeholder="e.g. iPhone 15, AC, Laptop">
+      </div>
+      <div class="irow">
+        <div class="ig">
+          <div class="ilbl">Total EMIs</div>
+          <input type="number" id="etk-total" class="if" placeholder="e.g. 12" inputmode="numeric" min="1">
+        </div>
+        <div class="ig">
+          <div class="ilbl">EMI Amount (₹)</div>
+          <input type="number" id="etk-amt" class="if" placeholder="0" inputmode="decimal">
+        </div>
+      </div>
+      <div class="ig">
+        <div class="ilbl">Start Month</div>
+        <input type="month" id="etk-start" class="if">
+      </div>
+      <div class="ig">
+        <label class="etk-theme-toggle">
+          <input type="checkbox" id="etk-theme-on" onchange="etkThemeToggle()">
+          🎨 Give this card a color theme
+        </label>
+        <div class="etk-theme-body" id="etk-theme-body" style="display:none">
+          <div class="etk-theme-presets" id="etk-theme-presets"></div>
+          <div class="etk-theme-row">
+            <input type="color" id="etk-theme-color" class="etk-color-input" value="#2563eb" oninput="etkUpdateThemePreview()">
+            <select id="etk-theme-select" class="if" onchange="etkThemeSelectChange()"></select>
+            <button type="button" class="etk-theme-del" onclick="etkDeleteSelectedTheme()" title="Delete saved theme">🗑</button>
+          </div>
+          <div class="etk-theme-row">
+            <input type="text" id="etk-theme-name" class="if" placeholder="Save as… e.g. HDFC Blue">
+            <button type="button" class="etk-mini-btn" onclick="etkSaveTheme()">💾 Save</button>
+          </div>
+          <div class="etk-theme-preview" id="etk-theme-preview">Preview</div>
+        </div>
+      </div>
+      <span id="etk-err" class="err hide"></span>
+      <div class="modal-btns">
+        <button class="cbtn e" onclick="etkSave()">Save</button>
+        <button class="cbtn" style="background:#e5e7eb;color:#374151;box-shadow:none;flex:0.4" onclick="etkCloseModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ LEASE FINANCE TAB ═══════════════ -->
+  <div id="t-lease" class="tab">
+
+  <!-- History Drawer -->
+  <div id="histOverlay" onclick="closeHist()"></div>
+  <div id="histDrawer">
+    <div class="hist-handle"></div>
+    <div class="hist-head">
+      <span class="hist-title">Saved Invoices</span>
+      <div style="display:flex;align-items:center;gap:4px">
+        <button class="hist-clear" onclick="exportHist()">⬇ Export</button>
+        <button class="hist-clear" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importHist(this)">
+        <button class="hist-clear red" onclick="clearAllHist()">Clear all</button>
+        <button class="hist-close" onclick="closeHist()">✕</button>
+      </div>
+    </div>
+    <div id="histList"></div>
+  </div>
+
+  <div class="lhdr">
+    <div class="lhdr-title">🌾 Lease Finance Pro</div>
+    <button id="histBtn" onclick="openHist()">🕐 History <span class="badge" id="histCount">0</span></button>
+  </div>
+
+  <div class="card">
+    <div class="ct" style="margin-bottom:10px">Lease Details</div>
+    <div class="irow">
+      <div class="ig"><div class="ilbl">Lessee Name</div><input id="lessee" class="if" placeholder="Lessee Name" oninput="markStale()"></div>
+      <div class="ig"><div class="ilbl">Year</div><input id="year" class="if" placeholder="e.g. 2026" oninput="markStale()"></div>
+    </div>
+    <div class="irow">
+      <div class="ig"><div class="ilbl">Land Area</div><input id="land" class="if" placeholder="e.g. 4" oninput="markStale()"></div>
+      <div class="ig"><div class="ilbl">Unit</div>
+        <select id="unit" class="if" onchange="markStale()">
+          <option value="acre">Acre</option>
+          <option value="kanal" selected>Kanal</option>
+        </select>
+      </div>
+    </div>
+    <div class="irow">
+      <div class="ig">
+        <div class="ilbl">₹ / Acre / Year</div>
+        <input id="rate" value="1,00,000" class="if" placeholder="e.g. 1,00,000" type="text" inputmode="numeric" oninput="fmtRate(this);markStale()">
+      </div>
+      <div class="ig">
+        <div class="ilbl">Payment Mode</div>
+        <select id="mode" class="if" onchange="markStale()">
+          <option value="yearly">Yearly</option>
+          <option value="half">Half Yearly</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card hide" id="advInterestCard">
+    <div class="ct" style="margin-bottom:10px">Interest on Advance</div>
+    <div class="irow">
+      <div class="ig">
+        <div class="ilbl">Interest Type</div>
+        <select id="it" class="if" onchange="markStale()">
+          <option value="rs100">Rs / 100 / month</option>
+          <option value="percent">% yearly</option>
+        </select>
+      </div>
+      <div class="ig">
+        <div class="ilbl">Rate</div>
+        <input id="lfp_ir" class="if" placeholder="e.g. 2" oninput="markStale()">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct" style="margin-bottom:4px">Advances</div>
+    <div class="info">Each advance can specify which half-yearly payment it deducts from.</div>
+    <div id="adv"></div>
+    <button class="add-adv-btn" onclick="addAdv()">＋ Add Advance</button>
+  </div>
+
+  <div class="actrow">
+    <button class="actbtn" onclick="printOnly()">🖨 Print</button>
+    <button class="actbtn" onclick="shareWA()" style="color:var(--grn);border-color:rgba(5,150,105,.25)">💬 WhatsApp</button>
+    <button class="actbtn" id="copyBtn" onclick="copyInvoice()">📋 Copy</button>
+    <button class="actbtn" onclick="resetAll()" style="color:var(--red);border-color:rgba(220,38,38,.2)">Reset</button>
+  </div>
+
+  <button class="cbtn p" onclick="handleGenerate()">Generate Invoice</button>
+
+  <div id="out"></div>
+  <div id="staleNote">⚠ Inputs changed — tap Generate Invoice to update</div>
+  <div id="paidBar" style="display:none"></div>
+
+  <!-- Save / Update confirmation dialog -->
+  <div id="saveDialog" onclick="if(event.target===this)closeSaveDialog()">
+    <div id="saveDialogPanel">
+      <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px">💾 Save Invoice</div>
+      <div style="font-size:13px;color:var(--dim);margin-bottom:18px;line-height:1.6">This invoice is already saved. Update the existing entry or save as a separate new one?</div>
+      <button onclick="calcUpdate()" class="cbtn p" style="margin-bottom:10px">Update Existing Entry</button>
+      <button onclick="calcNew()" style="width:100%;padding:13px;background:var(--bg2);color:var(--p1);border:1.5px solid rgba(109,40,217,.2);border-radius:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px">Save as New Entry</button>
+      <button onclick="closeSaveDialog()" style="width:100%;padding:11px;background:none;color:var(--dim);border:none;border-radius:13px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tbbar">
+    <button class="tbtn on" onclick="sw('land',this)"><span class="ti">🏡</span><span>Land</span></button>
+    <button class="tbtn" onclick="sw('int',this)"><span class="ti">💰</span><span>Interest</span></button>
+    <button class="tbtn" onclick="sw('emi',this)"><span class="ti">📊</span><span>EMI</span></button>
+    <button class="tbtn" onclick="sw('cmp',this)"><span class="ti">⚖️</span><span>Compare</span></button>
+    <button class="tbtn" onclick="sw('ldg',this)"><span class="ti">📒</span><span>Ledger</span></button>
+    <button class="tbtn" onclick="sw('lease',this)"><span class="ti">🌾</span><span>Lease</span></button>
+  </div>
+
+  <div id="toast">✓ Copied</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// LAND  (units: no Cent, Guntha, Hectare)
+// ══════════════════════════════════════════════════════════
+const LU={
+  marla:  {lbl:'Marla',       sqft:272.25},
+  kanal:  {lbl:'Kanal',       sqft:5445},
+  biswa:  {lbl:'Biswa',       sqft:453.75},
+  bigha:  {lbl:'Bigha',       sqft:9075},
+  acre:   {lbl:'Acre/Killa',  sqft:43560},
+  sqft:   {lbl:'Sq Feet',     sqft:1},
+  sqyd:   {lbl:'Sq Yd/Gaj',   sqft:9},
+  sqm:    {lbl:'Sq Meter',    sqft:1/0.09290304},
+};
+const HI=['marla','kanal','acre','sqft','sqyd'];
+function doLand(){
+  const v=parseFloat(document.getElementById('lv').value);
+  const from=document.getElementById('lf').value;
+  const g=document.getElementById('lgrid');
+  if(!v||isNaN(v)||v<=0){g.innerHTML='';document.getElementById('lpres').classList.add('hide');return}
+  const sf=v*LU[from].sqft;
+  let h='';
+  for(const[k,u]of Object.entries(LU)){
+    if(k===from)continue;
+    const cv=sf/u.sqft;
+    h+=`<div class="litem${HI.includes(k)?' hi':''}"><div class="lunit">${u.lbl}</div><div class="lval">${fmtL(cv)}</div></div>`;
+  }
+  g.innerHTML=h;
+  calcLandPrice();
+}
+function fmtL(v){
+  if(v===0)return'0';
+  if(v>=1e9)return(v/1e9).toFixed(3)+'B';
+  if(v>=1e7)return v.toLocaleString('en-IN',{maximumFractionDigits:2});
+  if(v>=1000)return v.toLocaleString('en-IN',{maximumFractionDigits:3});
+  if(v>=1)return v.toLocaleString('en-IN',{maximumFractionDigits:6});
+  if(v>=0.0001)return v.toPrecision(5);
+  return v.toExponential(4);
+}
+
+function calcLandPrice(){
+  const errEl=document.getElementById('lperr');
+  const res=document.getElementById('lpres');
+  errEl.classList.add('hide');
+  res.classList.add('hide');
+
+  const areaVal=parseFloat(document.getElementById('lv').value);
+  const fromUnit=document.getElementById('lf').value;
+  const rate=parseFloat(document.getElementById('lprate').value);
+  const rateUnit=document.getElementById('lprunit').value;
+
+  if(!rate||rate<=0) return;
+  if(!areaVal||isNaN(areaVal)||areaVal<=0){
+    showErr(errEl,'Enter an area value above first');return;
+  }
+
+  // convert area to rate unit
+  const sqft_area=areaVal*LU[fromUnit].sqft;
+  const areaInRateUnit=sqft_area/LU[rateUnit].sqft;
+  const totalCost=areaInRateUnit*rate;
+
+  // per sqft / per sqyd rate
+  const ratePerSqft=rate/LU[rateUnit].sqft;
+  const ratePerSqyd=ratePerSqft*9;
+
+  const runitLbl=LU[rateUnit].lbl;
+  const fromLbl=LU[fromUnit].lbl;
+
+  document.getElementById('lptotal').textContent='₹'+fmt(totalCost);
+  document.getElementById('lpsub').textContent=
+    `Total cost for ${fmtL(areaVal)} ${fromLbl}`;
+  document.getElementById('lparea').textContent=
+    `${fmtL(areaVal)} ${fromLbl} = ${fmtL(areaInRateUnit)} ${runitLbl}`;
+  document.getElementById('lpprate').textContent=
+    '₹'+fmt(rate)+' / '+runitLbl;
+  document.getElementById('lppersqft').textContent='₹'+fmt(ratePerSqft);
+  document.getElementById('lppersqyd').textContent='₹'+fmt(ratePerSqyd);
+
+  res.classList.remove('hide');
+}
+
+function clearLand(){
+  document.getElementById('lv').value='';
+  document.getElementById('lf').value='marla';
+  document.getElementById('lgrid').innerHTML='';
+  document.getElementById('lpres').classList.add('hide');
+  document.getElementById('lperr').classList.add('hide');
+}
+
+function clearLandPrice(){
+  document.getElementById('lprate').value='';
+  document.getElementById('lprunit').value='marla';
+  document.getElementById('lpres').classList.add('hide');
+  document.getElementById('lperr').classList.add('hide');
+}
+
+// ══════════════════════════════════════════════════════════
+let iMode='std'; // 'std' | 'vil'
+let iRT='rs100'; // 'rs100' | 'pct'
+let iRP='pm';    // 'pm'=per month | 'py'=per year | 'pd'=per day | 'pa'=per annum
+let iTM='dur';   // 'dur' | 'dt'
+let iIT='si';    // 'si' | 'ci'
+let iCF=12;      // compounding freq/year
+let lastInt=null,lastEmi=null;
+
+function setIM(m,btn){
+  iMode=m;
+  btn.closest('.seg').querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const vil=m==='vil';
+  document.getElementById('vilnote').classList.toggle('hide',!vil);
+  document.getElementById('stdnote').classList.toggle('hide',vil);
+  document.getElementById('icbtn').className='cbtn '+(vil?'v':'p');
+  // village defaults to ₹/₹100 per month
+  if(vil){
+    document.querySelectorAll('#rtSeg .sb').forEach(b=>b.classList.remove('on'));
+    document.querySelector('#rtSeg .sb[data-v="rs100"]').classList.add('on');
+    iRT='rs100';
+    document.getElementById('rpRs').classList.remove('hide');
+    document.getElementById('rpPct').classList.add('hide');
+    document.querySelectorAll('#rpRs .sb').forEach(b=>b.classList.remove('on'));
+    document.querySelector('#rpRs .sb[data-v="pm"]').classList.add('on');
+    iRP='pm';
+  }
+  updRlbl();updReq();
+}
+function setRT(btn){
+  iRT=btn.dataset.v;
+  document.querySelectorAll('#rtSeg .sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const isRs=iRT==='rs100';
+  document.getElementById('rpRs').classList.toggle('hide',!isRs);
+  document.getElementById('rpPct').classList.toggle('hide',isRs);
+  // set default period for new type
+  if(isRs){iRP='pm';document.querySelectorAll('#rpRs .sb').forEach((b,i)=>{b.classList.toggle('on',i===0)})}
+  else{iRP='pa';document.querySelectorAll('#rpPct .sb').forEach((b,i)=>{b.classList.toggle('on',i===0)})}
+  updRlbl();updReq();
+}
+function setRP(btn){
+  iRP=btn.dataset.v;
+  btn.closest('.seg').querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  updRlbl();updReq();
+}
+function updRlbl(){
+  const lbl=document.getElementById('rlbl');
+  if(iRT==='rs100'){
+    const m={pm:'Per Month',py:'Per Year',pd:'Per Day'};
+    lbl.textContent='₹ per ₹100 — '+m[iRP];
+  }else{
+    lbl.textContent=iRP==='pa'?'Rate (% per Annum)':'Rate (% per Month)';
+  }
+}
+
+// Live rate equivalents
+function updReq(){
+  const rval=parseFloat(document.getElementById('ir').value);
+  const box=document.getElementById('reqbox');
+  const vil=iMode==='vil';
+  box.className='reqbox'+(vil?' vr':'');
+  if(!rval||rval<=0||isNaN(rval)){box.classList.add('hide');return}
+  // Compute monthly % and annual %
+  let mth,ann;
+  if(iRT==='rs100'){
+    if(iRP==='pm'){mth=rval;ann=rval*12}
+    else if(iRP==='py'){ann=rval;mth=rval/12}
+    else{/* per day */mth=rval*30;ann=rval*365}
+  }else{
+    if(iRP==='pa'){ann=rval;mth=rval/12}
+    else{mth=rval;ann=rval*12}
+  }
+  document.getElementById('req_mth_pct').textContent=mth.toFixed(4)+'% p.m.';
+  document.getElementById('req_ann_pct').textContent=ann.toFixed(4)+'% p.a.';
+  document.getElementById('req_rs_mth').textContent='₹'+mth.toFixed(4)+' per ₹100';
+  document.getElementById('req_rs_yr').textContent='₹'+ann.toFixed(4)+' per ₹100';
+  box.classList.remove('hide');
+}
+
+function setTM(m,btn){
+  iTM=m;
+  btn.closest('.seg').querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('durSec').classList.toggle('hide',m!=='dur');
+  document.getElementById('dtSec').classList.toggle('hide',m!=='dt');
+}
+function setIT(t,btn){
+  iIT=t;
+  btn.closest('.seg').querySelectorAll('.sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('cmpOpts').classList.toggle('hide',t!=='ci');
+  document.getElementById('effrow').classList.toggle('hide',t!=='ci');
+}
+function setCF(btn){
+  document.querySelectorAll('#cfSeg .sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  iCF=parseInt(btn.dataset.n);
+}
+function updDD(){
+  const s=document.getElementById('isd').value;
+  let e=document.getElementById('ied').value||todayStr();
+  const badge=document.getElementById('ddbadge'),txt=document.getElementById('ddtxt');
+  if(s){
+    const d=diffDays(s,e);
+    if(d>0){
+      const toToday=!document.getElementById('ied').value;
+      txt.textContent=`📅 ${d.toLocaleString('en-IN')} days${toToday?' (to today)':''} = ${(d/30).toFixed(1)} months = ${(d/365).toFixed(2)} yrs`;
+      badge.classList.remove('hide');
+    }else{
+      txt.textContent='⚠ End date must be after start date';
+      badge.classList.remove('hide');
+    }
+  }else badge.classList.add('hide');
+}
+
+// ══════════════════════════════════════════════════════════
+// GET TIME DATA
+// ══════════════════════════════════════════════════════════
+function getTimeData(){
+  if(iTM==='dt'){
+    const s=document.getElementById('isd').value;
+    const eRaw=document.getElementById('ied').value;
+    const e=eRaw||todayStr();
+    if(!s)return null;
+    const d=diffDays(s,e);
+    if(d<=0)return null;
+    return{days:d,months_vil:d/30,years_std:d/365,
+      label:`${d.toLocaleString('en-IN')} days (≈${(d/30).toFixed(1)} months)`,
+      startDate:s,endDate:eRaw?e:null};
+  }
+  const p=parseFloat(document.getElementById('iperiod').value);
+  const u=document.getElementById('iunit').value;
+  if(!p||p<=0)return null;
+  let days;
+  if(u==='d') days=p;
+  else if(u==='m') days=iMode==='vil'?p*30:Math.round(p*30.4375);
+  else             days=iMode==='vil'?p*360:Math.round(p*365);
+  const ul=u==='d'?'day'+(p!==1?'s':''):u==='m'?'month'+(p!==1?'s':''):'year'+(p!==1?'s':'');
+  return{days,months_vil:days/30,years_std:days/365,
+    label:`${p} ${ul} (${days.toLocaleString('en-IN')} days)`,
+    startDate:null,endDate:null};
+}
+
+// ══════════════════════════════════════════════════════════
+// ANNUAL RATE & VILLAGE MONTHLY RATE
+// ══════════════════════════════════════════════════════════
+function getAnnualPct(rval){
+  if(iRT==='rs100'){
+    if(iRP==='pm')return rval*12;
+    if(iRP==='py')return rval;
+    if(iRP==='pd')return rval*365;
+  }else{
+    if(iRP==='pa')return rval;
+    if(iRP==='pm')return rval*12;
+  }
+}
+function getVillMthRate(rval){
+  // returns monthly decimal rate
+  if(iRT==='rs100'){
+    if(iRP==='pm')return rval/100;
+    if(iRP==='py')return rval/100/12;
+    if(iRP==='pd')return rval*30/100;
+  }else{
+    if(iRP==='pa')return rval/100/12;
+    if(iRP==='pm')return rval/100;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// CALCULATE INTEREST
+// ══════════════════════════════════════════════════════════
+function calcInt(){
+  const errEl=document.getElementById('ierr');
+  errEl.classList.add('hide');
+  const P=parseFloat(document.getElementById('ip').value.replace(/,/g,''));
+  const rval=parseFloat(document.getElementById('ir').value);
+  if(!P||P<=0){showErr(errEl,'Enter a valid principal amount');return}
+  if(isNaN(rval)||rval<=0){showErr(errEl,'Enter a valid interest rate');return}
+  const td=getTimeData();
+  if(!td){showErr(errEl,'Enter a valid time period');return}
+
+  let interest,amount,annPct,effRate,typeLabel,rateDesc;
+  const vil=iMode==='vil';
+
+  if(vil){
+    const rm=getVillMthRate(rval);
+    const n=td.months_vil;
+    if(iIT==='si'){
+      // Baru Vaddi: I = P × monthly_rate × months
+      interest=P*rm*n;
+      amount=P+interest;
+      effRate=rm*12*100;
+    }else{
+      // Chakra Vaddi: A = P × (1+rm)^months
+      amount=P*Math.pow(1+rm,n);
+      interest=amount-P;
+      effRate=(Math.pow(1+rm,12)-1)*100;
+    }
+    annPct=rm*12*100;
+    const pm={pm:'per month',py:'per year',pd:'per day'};
+    rateDesc=iRT==='rs100'?`₹${rval}/₹100 ${pm[iRP]}`:`${rval}% ${iRP==='pa'?'p.a.':'p.m.'}`;
+    rateDesc+=' (village method)';
+    typeLabel=iIT==='si'?'Simple — Baru Vaddi':'Compound — Chakra Vaddi';
+  }else{
+    annPct=getAnnualPct(rval);
+    const r=annPct/100,T=td.years_std;
+    if(iIT==='si'){
+      interest=P*r*T;
+      amount=P+interest;
+      effRate=annPct;
+    }else{
+      const n=iCF;
+      amount=P*Math.pow(1+r/n,n*T);
+      interest=amount-P;
+      effRate=(Math.pow(1+r/n,n)-1)*100;
+    }
+    if(iRT==='rs100'){
+      const pm={pm:'per month',py:'per year',pd:'per day'};
+      rateDesc=`₹${rval}/₹100 ${pm[iRP]} = ${annPct.toFixed(4)}% p.a.`;
+    }else{
+      rateDesc=`${rval}% ${iRP==='pa'?'per annum':'per month'}`;
+      if(iRP==='pm') rateDesc+=` = ${annPct.toFixed(4)}% p.a.`;
+    }
+    const cfLbl=['Daily','Monthly','Quarterly','Half-Yearly','Yearly'][[365,12,4,2,1].indexOf(iCF)];
+    typeLabel=iIT==='si'?'Simple Interest':`${cfLbl} Compound Interest`;
+  }
+
+  if(!isFinite(interest)||!isFinite(amount)||interest<0){
+    showErr(errEl,'Calculation overflow — please check inputs');return;
+  }
+
+  const dly=interest/td.days;
+  const mth=interest/td.months_vil;
+  const pPct=(P/amount*100).toFixed(1);
+  const iPct=(interest/amount*100).toFixed(1);
+
+  // update result card colour
+  document.getElementById('ircard').className='rcard '+(vil?'v':'p');
+  document.getElementById('rit').className='rval xl '+(vil?'vg':'pg');
+  document.getElementById('effrow').classList.toggle('hide',iIT!=='ci');
+
+  document.getElementById('rip').textContent='₹'+fmt(P);
+  document.getElementById('rii').textContent='₹'+fmt(interest);
+  document.getElementById('rit').textContent='₹'+fmt(amount);
+  document.getElementById('rira').textContent=annPct.toFixed(4)+'% p.a.';
+  document.getElementById('rieff').textContent=effRate.toFixed(4)+'% p.a.';
+  document.getElementById('riperiod').textContent=td.label;
+  document.getElementById('rimth').textContent='₹'+fmt(mth)+' / month';
+  document.getElementById('ridly').textContent='₹'+fmt(dly)+' / day';
+  document.getElementById('ipp').textContent=pPct+'%';
+  document.getElementById('ipi').textContent=iPct+'%';
+
+  drawPie('ipie',P,interest,vil?'#d97706':'#6d28d9','#059669');
+
+  const sb=document.getElementById('isum');
+  sb.className='sbox'+(vil?' v':'');
+  sb.innerHTML=
+    `<strong>₹${fmt(P)}</strong> at <strong>${rateDesc}</strong><br>`+
+    `Period: <strong>${td.label}</strong><br>`+
+    `Type: <strong>${typeLabel}</strong><br>`+
+    `Interest: <strong style="color:var(--grn)">₹${fmt(interest)}</strong>`+
+    `&nbsp;&nbsp;→&nbsp;&nbsp;Total: <strong>₹${fmt(amount)}</strong>`;
+
+  lastInt={P,rval,rateDesc,annPct,interest,total:amount,typeLabel,timeLabel:td.label};
+  document.getElementById('ires').classList.remove('hide');
+  document.getElementById('ires').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ══════════════════════════════════════════════════════════
+// EMI
+// ══════════════════════════════════════════════════════════
+function updET(){
+  const v=parseFloat(document.getElementById('et').value);
+  const u=document.getElementById('eunit').value;
+  const el=document.getElementById('etinfo');
+  if(!v||v<=0){el.classList.add('hide');return}
+  if(u==='m'){
+    const y=v/12;
+    el.textContent=`${Math.round(v)} monthly EMI payments  =  ${y%1===0?y:y.toFixed(2)} year${y!==1?'s':''}`;
+  }else{
+    const m=Math.round(v*12);
+    el.textContent=`${v} year${v!==1?'s':''}  =  ${m} monthly EMI payments`;
+  }
+  el.classList.remove('hide');
+}
+
+function syncEMIRate(src){
+  const ann=document.getElementById('er');
+  const mth=document.getElementById('er_mth');
+  if(src==='annual'){
+    const v=parseFloat(ann.value);
+    mth.value=isNaN(v)||v<0?'':+(v/12).toFixed(6);
+  }else{
+    const v=parseFloat(mth.value);
+    ann.value=isNaN(v)||v<0?'':+(v*12).toFixed(6);
+  }
+}
+
+function calcEMI(){
+  const errEl=document.getElementById('eerr');
+  errEl.classList.add('hide');
+  const P=parseFloat(document.getElementById('ep').value.replace(/,/g,''));
+  const ann=parseFloat(document.getElementById('er').value);
+  const u=document.getElementById('eunit').value;
+  let N=parseFloat(document.getElementById('et').value);
+  if(!P||P<=0){showErr(errEl,'Enter a valid loan amount');return}
+  if(isNaN(ann)||ann<0){showErr(errEl,'Enter a valid interest rate');return}
+  if(!N||N<=0){showErr(errEl,'Enter a valid tenure');return}
+  // sync monthly rate field
+  document.getElementById('er_mth').value=+(ann/12).toFixed(6);
+  if(u==='y') N=N*12;
+  N=Math.round(N);
+  const R=ann/12/100; // monthly rate decimal
+  let emi,totalPay,totalInt;
+  if(R===0){
+    emi=P/N; totalPay=P; totalInt=0;
+  }else{
+    // EMI = P × R × (1+R)^N / ((1+R)^N − 1)
+    const pow=Math.pow(1+R,N);
+    emi=(P*R*pow)/(pow-1);
+    totalPay=emi*N;
+    totalInt=totalPay-P;
+  }
+  if(!isFinite(emi)){showErr(errEl,'Calculation overflow — check inputs');return}
+  const pPct=(P/totalPay*100).toFixed(1);
+  const iPct=(totalInt/totalPay*100).toFixed(1);
+  document.getElementById('eemi').textContent='₹'+fmt(emi);
+  document.getElementById('erate_ann').textContent=ann.toFixed(4)+'% p.a.';
+  document.getElementById('erate_mth').textContent=(ann/12).toFixed(4)+'% p.m.';
+  document.getElementById('eprin').textContent='₹'+fmt(P);
+  document.getElementById('eint').textContent='₹'+fmt(totalInt);
+  document.getElementById('etot').textContent='₹'+fmt(totalPay);
+  document.getElementById('eipct').textContent=iPct+'% of loan';
+  document.getElementById('eavg').textContent='₹'+fmt(totalInt/N)+' / month';
+  document.getElementById('epp').textContent=pPct+'%';
+  document.getElementById('eip').textContent=iPct+'%';
+  drawPie('epie',P,totalInt,'#0f766e','#dc2626');
+  buildAmort(P,R,emi,N);
+  lastEmi={P,ann,N,emi,totalPay,totalInt};
+  document.getElementById('eres').classList.remove('hide');
+  document.getElementById('eres').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function buildAmort(P,R,emi,N){
+  let bal=P,h='',totPrincipal=0,totInterest=0,totEmi=0;
+  for(let i=1;i<=N;i++){
+    const ip=bal*R,pp=emi-ip;
+    bal=Math.max(0,bal-pp);
+    if(Math.abs(bal)<0.005)bal=0;
+    const safePP=Math.max(0,pp),safeIP=Math.max(0,ip);
+    totPrincipal+=safePP;totInterest+=safeIP;totEmi+=emi;
+    h+=`<tr><td>${i}</td><td>${fmtS(emi)}</td><td style="color:var(--grn)">${fmtS(safePP)}</td><td style="color:var(--red)">${fmtS(safeIP)}</td><td>${fmtS(bal)}</td></tr>`;
+  }
+  document.getElementById('ambd').innerHTML=h;
+  document.getElementById('amtfoot').innerHTML=`<tr>
+    <td>TOTAL</td>
+    <td>${fmtS(totEmi)}</td>
+    <td class="tot-grn">${fmtS(totPrincipal)}</td>
+    <td class="tot-red">${fmtS(totInterest)}</td>
+    <td>—</td>
+  </tr>`;
+}
+function togAm(){
+  document.getElementById('amtog').classList.toggle('on');
+  document.getElementById('amsec').classList.toggle('hide');
+}
+
+// ══════════════════════════════════════════════════════════
+// PIE CHART
+// ══════════════════════════════════════════════════════════
+function drawPie(id,v1,v2,c1,c2){
+  const cv=document.getElementById(id);
+  if(!cv)return;
+  const ctx=cv.getContext('2d'),total=v1+v2;
+  const cx=cv.width/2,cy=cv.height/2,r=cx-4;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  if(total<=0)return;
+  const a1=(v1/total)*2*Math.PI;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+a1);ctx.closePath();
+  ctx.fillStyle=c1;ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,-Math.PI/2+a1,-Math.PI/2+2*Math.PI);ctx.closePath();
+  ctx.fillStyle=c2;ctx.fill();
+  // donut hole — match parent card background dynamically
+  const cardEl=cv.closest('.card,.rcard');
+  ctx.beginPath();ctx.arc(cx,cy,r*0.52,0,2*Math.PI);
+  ctx.fillStyle=cardEl?getComputedStyle(cardEl).backgroundColor:'#f2efff';ctx.fill();
+}
+
+// ══════════════════════════════════════════════════════════
+// SHARE / COPY
+// ══════════════════════════════════════════════════════════
+function shareRes(t){
+  let txt='';
+  if(t==='int'&&lastInt)
+    txt=`FinCalc — Interest\nPrincipal: ₹${fmt(lastInt.P)}\nRate: ${lastInt.rateDesc}\nPeriod: ${lastInt.timeLabel}\nType: ${lastInt.typeLabel}\nInterest: ₹${fmt(lastInt.interest)}\nTotal: ₹${fmt(lastInt.total)}`;
+  else if(t==='emi'&&lastEmi)
+    txt=`FinCalc — EMI\nLoan: ₹${fmt(lastEmi.P)}\nRate: ${lastEmi.ann}% p.a.\nTenure: ${lastEmi.N} months\nMonthly EMI: ₹${fmt(lastEmi.emi)}\nTotal Interest: ₹${fmt(lastEmi.totalInt)}\nTotal Payment: ₹${fmt(lastEmi.totalPay)}`;
+  if(!txt)return;
+  if(navigator.share)navigator.share({title:'FinCalc Pro',text:txt}).catch(()=>{});
+  else navigator.clipboard.writeText(txt).then(()=>alert('Copied!')).catch(()=>{});
+}
+function copyRes(t){
+  const src=t==='int'?document.getElementById('isum'):null;
+  const txt=src?src.innerText:(t==='emi'&&lastEmi?`EMI ₹${fmt(lastEmi.emi)} | Interest ₹${fmt(lastEmi.totalInt)} | Total ₹${fmt(lastEmi.totalPay)}`:'');
+  if(!txt)return;
+  navigator.clipboard.writeText(txt).then(()=>showToast(t)).catch(()=>showToast(t));
+}
+
+let _toastTimer=null;
+function showToast(t){
+  // briefly change the button label
+  const btns=document.querySelectorAll(`#t-${t} .actbtn`);
+  let copyBtn=null;
+  btns.forEach(b=>{if(b.textContent.includes('Copy'))copyBtn=b});
+  if(copyBtn){const orig=copyBtn.innerHTML;copyBtn.innerHTML='✓ Copied!';setTimeout(()=>copyBtn.innerHTML=orig,1800)}
+  // show toast
+  const el=document.getElementById('toast');
+  if(_toastTimer){clearTimeout(_toastTimer);el.className=''}
+  void el.offsetWidth; // force reflow
+  el.className='show';
+  _toastTimer=setTimeout(()=>{
+    el.className='hide-anim';
+    _toastTimer=setTimeout(()=>{el.className=''},220);
+  },1800);
+}
+
+// ══════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════
+function _inrComma(s){
+  // Indian comma format for a digit-only string: xx,xx,xxx
+  if(s.length<=3)return s;
+  let r=','+s.slice(-3);s=s.slice(0,-3);
+  while(s.length>2){r=','+s.slice(-2)+r;s=s.slice(0,-2);}
+  return s+r;
+}
+function fmt(v){
+  // Always 2 decimal places with Indian commas
+  if(isNaN(v)||!isFinite(v))return'0.00';
+  const neg=v<0,parts=Math.abs(v).toFixed(2).split('.');
+  return(neg?'-':'')+_inrComma(parts[0])+'.'+parts[1];
+}
+function fmtS(v){
+  // Up to 2 decimal places, trailing zeros stripped, Indian commas
+  if(isNaN(v)||!isFinite(v))return'0';
+  const neg=v<0,str=parseFloat(Math.abs(v).toFixed(2)).toString().split('.');
+  return(neg?'-':'')+_inrComma(str[0])+(str[1]?'.'+str[1]:'');
+}
+function diffDays(s,e){
+  return Math.round((new Date(e+'T12:00:00')-new Date(s+'T12:00:00'))/86400000);
+}
+function todayStr(){return new Date().toISOString().split('T')[0]}
+function showErr(el,msg){el.textContent='⚠ '+msg;el.classList.remove('hide');el.scrollIntoView({behavior:'smooth',block:'nearest'})}
+function sw(n,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('t-'+n).classList.add('on');
+  btn.classList.add('on');
+}
+
+// ══════════════════════════════════════════════════════════
+// CLEAR / RESET
+// ══════════════════════════════════════════════════════════
+function clearInt(){
+  // inputs
+  document.getElementById('ip').value='';
+  document.getElementById('ir').value='';
+  document.getElementById('iperiod').value='';
+  document.getElementById('isd').value=todayStr();
+  document.getElementById('ied').value='';
+  // reset mode toggles to Standard defaults
+  iMode='std'; iRT='rs100'; iRP='pm'; iTM='dur'; iIT='si'; iCF=12;
+  // segment buttons
+  document.querySelectorAll('#t-int .seg .sb').forEach(b=>b.classList.remove('on'));
+  document.querySelector('#t-int .seg .sb:first-child').classList.add('on');       // Standard
+  document.querySelector('#rtSeg .sb[data-v="rs100"]').classList.add('on');         // ₹/₹100
+  document.querySelector('#rpRs .sb[data-v="pm"]').classList.add('on');             // Per Month
+  document.querySelector('#rpPct .sb[data-v="pa"]').classList.add('on');            // Per Annum
+  document.querySelector('#t-int .card:nth-child(5) .seg .sb:first-child').classList.add('on'); // Duration
+  document.querySelector('#cfSeg .sb[data-n="12"]').classList.add('on');            // Monthly compound
+  // show/hide panels
+  document.getElementById('vilnote').classList.add('hide');
+  document.getElementById('stdnote').classList.remove('hide');
+  document.getElementById('rpRs').classList.remove('hide');
+  document.getElementById('rpPct').classList.add('hide');
+  document.getElementById('durSec').classList.remove('hide');
+  document.getElementById('dtSec').classList.add('hide');
+  document.getElementById('ddbadge').classList.add('hide');
+  document.getElementById('cmpOpts').classList.add('hide');
+  document.getElementById('reqbox').classList.add('hide');
+  document.getElementById('effrow').classList.add('hide');
+  // button colour
+  document.getElementById('icbtn').className='cbtn p';
+  // hide result & error
+  document.getElementById('ires').classList.add('hide');
+  document.getElementById('ierr').classList.add('hide');
+  // reset state
+  lastInt=null;
+  updRlbl();
+}
+
+function clearEMI(){
+  document.getElementById('ep').value='';
+  document.getElementById('er').value='';
+  document.getElementById('er_mth').value='';
+  document.getElementById('et').value='';
+  document.getElementById('eunit').value='m';
+  document.getElementById('etinfo').classList.add('hide');
+  // hide result & error
+  document.getElementById('eres').classList.add('hide');
+  document.getElementById('eerr').classList.add('hide');
+  // collapse amortization
+  document.getElementById('amtog').classList.remove('on');
+  document.getElementById('amsec').classList.add('hide');
+  document.getElementById('ambd').innerHTML='';
+  document.getElementById('amtfoot').innerHTML='';
+  lastEmi=null;
+}
+
+// ══════════════════════════════════════════════════════════
+// LOAN COMPARISON
+// ══════════════════════════════════════════════════════════
+const LC_COLORS=['lc1','lc2','lc3'];
+const LC_BAR=['bf1','bf2','bf3'];
+const LC_TEXT=['lc1c','lc2c','lc3c'];
+let loanCount=2;
+
+function buildLoanCards(){
+  const wrap=document.getElementById('loanCardsWrap');
+  wrap.innerHTML='';
+  const grid=document.createElement('div');
+  grid.className=loanCount===3?'lcmp-g3':'lcmp-g2';
+  grid.id='loanGrid';
+  for(let i=0;i<loanCount;i++) grid.appendChild(makeLoanCard(i));
+  wrap.appendChild(grid);
+  document.getElementById('addLoanBtn').disabled=loanCount>=3;
+  document.getElementById('addLoanBtn').style.display=loanCount>=3?'none':'flex';
+  syncSharedAmt();
+}
+
+function makeLoanCard(i){
+  const col=LC_COLORS[i];
+  const names=['Bank A','Bank B','Bank C'];
+  const div=document.createElement('div');
+  div.className='lcard '+col;
+  div.id='lc'+i;
+  const shared=document.getElementById('shareAmt').checked;
+  div.innerHTML=`
+    <div class="lcard-head">
+      <div class="lcard-dot"></div>
+      <input class="lcard-name" id="lcname${i}" value="${names[i]}" maxlength="12">
+      ${i>=2?`<button class="lcard-del" onclick="removeLoan()" title="Remove">✕</button>`:''}
+    </div>
+    ${!shared?`<div class="ilbl">Loan Amount</div>
+    <div class="irow" style="margin-bottom:8px">
+      <div class="ig"><input type="text" id="lcp${i}" class="if" placeholder="₹ Amount" inputmode="numeric" oninput="fmtRate(this)"></div>
+    </div>`:''}
+    <div class="ilbl">Rate % p.a.</div>
+    <div class="irow" style="margin-bottom:5px">
+      <div class="ig"><input type="number" id="lcr${i}" class="if" placeholder="e.g. 12" inputmode="decimal" step="0.01" min="0" oninput="syncLcRate(${i},'ann')"></div>
+    </div>
+    <div class="ilbl">Rate % p.m.</div>
+    <div class="irow" style="margin-bottom:8px">
+      <div class="ig"><input type="number" id="lcrmth${i}" class="if" placeholder="e.g. 1" inputmode="decimal" step="0.001" min="0" oninput="syncLcRate(${i},'mth')"></div>
+    </div>
+    <div class="ilbl">Tenure</div>
+    <div class="irow">
+      <div class="ig" style="flex:2"><input type="number" id="lct${i}" class="if" placeholder="e.g. 24" inputmode="numeric" min="1"></div>
+      <div class="ig" style="flex:1.5"><select id="lctu${i}" class="if"><option value="m">Mo</option><option value="y">Yr</option></select></div>
+    </div>`;
+  return div;
+}
+
+function syncLcRate(i,src){
+  const ann=document.getElementById('lcr'+i);
+  const mth=document.getElementById('lcrmth'+i);
+  if(!ann||!mth)return;
+  if(src==='ann'){
+    const v=parseFloat(ann.value);
+    mth.value=isNaN(v)||v<0?'':+(v/12).toFixed(6);
+  }else{
+    const v=parseFloat(mth.value);
+    ann.value=isNaN(v)||v<0?'':+(v*12).toFixed(6);
+  }
+}
+
+function addLoanCard(){
+  if(loanCount>=3)return;
+  loanCount=3;
+  buildLoanCards();
+}
+
+function removeLoan(){
+  if(loanCount<=2)return;
+  // grab values before rebuild
+  const vals=getLoanVals();
+  loanCount=2;
+  buildLoanCards();
+  // restore first 2 values
+  restoreLoanVals(vals.slice(0,2));
+}
+
+function toggleShareAmt(){
+  const on=document.getElementById('shareAmt').checked;
+  document.getElementById('sharedAmtCard').classList.toggle('hide',!on);
+  buildLoanCards();
+}
+
+function syncSharedAmt(){
+  const on=document.getElementById('shareAmt').checked;
+  document.getElementById('sharedAmtCard').classList.toggle('hide',!on);
+}
+
+function getLoanVals(){
+  const shared=document.getElementById('shareAmt').checked;
+  const sharedAmt=parseFloat(document.getElementById('cSharedAmt').value.replace(/,/g,''))||0;
+  const vals=[];
+  for(let i=0;i<loanCount;i++){
+    const P=shared?sharedAmt:(parseFloat(((document.getElementById('lcp'+i)||{}).value||'').replace(/,/g,''))||0);
+    const r=parseFloat((document.getElementById('lcr'+i)||{}).value)||0;
+    const tu=(document.getElementById('lctu'+i)||{}).value||'m';
+    const tRaw=parseFloat((document.getElementById('lct'+i)||{}).value)||0;
+    const N=tu==='y'?Math.round(tRaw*12):Math.round(tRaw);
+    const name=(document.getElementById('lcname'+i)||{}).value||('Loan '+(i+1));
+    vals.push({P,r,N,name,col:LC_COLORS[i]});
+  }
+  return vals;
+}
+
+function restoreLoanVals(vals){
+  const shared=document.getElementById('shareAmt').checked;
+  if(shared){
+    const el=document.getElementById('cSharedAmt');
+    el.value=vals[0]&&vals[0].P?vals[0].P:'';
+    if(el.value)fmtRate(el);
+  }
+  vals.forEach((v,i)=>{
+    if(document.getElementById('lcname'+i)) document.getElementById('lcname'+i).value=v.name||'';
+    if(!shared){
+      const lcp=document.getElementById('lcp'+i);
+      if(lcp){lcp.value=v.P||'';if(lcp.value)fmtRate(lcp);}
+    }
+    if(document.getElementById('lcr'+i)) document.getElementById('lcr'+i).value=v.r||'';
+    if(document.getElementById('lcrmth'+i)&&v.r) document.getElementById('lcrmth'+i).value=+(v.r/12).toFixed(6);
+    if(document.getElementById('lct'+i)) document.getElementById('lct'+i).value=v.N||'';
+  });
+}
+
+function calcCompare(){
+  const errEl=document.getElementById('cmperr');
+  errEl.classList.add('hide');
+  const loans=getLoanVals();
+
+  // validate
+  for(let i=0;i<loans.length;i++){
+    const l=loans[i];
+    if(!l.P||l.P<=0){showErr(errEl,`Enter loan amount for ${l.name}`);return}
+    if(!l.r||l.r<0){showErr(errEl,`Enter interest rate for ${l.name}`);return}
+    if(!l.N||l.N<=0){showErr(errEl,`Enter tenure for ${l.name}`);return}
+  }
+
+  // calc EMI for each
+  const results=loans.map(l=>{
+    const R=l.r/12/100;
+    let emi,totalPay,totalInt;
+    if(R===0){emi=l.P/l.N;totalPay=l.P;totalInt=0}
+    else{const pow=Math.pow(1+R,l.N);emi=(l.P*R*pow)/(pow-1);totalPay=emi*l.N;totalInt=totalPay-l.P}
+    return{...l,emi,totalPay,totalInt,R};
+  });
+
+  // find best (lowest total interest)
+  const minInt=Math.min(...results.map(r=>r.totalInt));
+  const maxInt=Math.max(...results.map(r=>r.totalInt));
+  const minEmi=Math.min(...results.map(r=>r.emi));
+  const maxEmi=Math.max(...results.map(r=>r.emi));
+  const minTot=Math.min(...results.map(r=>r.totalPay));
+  const maxTot=Math.max(...results.map(r=>r.totalPay));
+  const winnerIdx=results.findIndex(r=>r.totalInt===minInt);
+  const loserIdx=results.findIndex(r=>r.totalInt===maxInt);
+  const winner=results[winnerIdx];
+  const loser=results[loserIdx];
+
+  // winner banner
+  document.getElementById('cmpWinnerName').textContent=winner.name+' 🏆';
+  document.getElementById('cmpWinnerSub').textContent=
+    `Lowest total interest · EMI ₹${fmt(winner.emi)} / month · Total ₹${fmt(winner.totalPay)}`;
+
+  // build table
+  const head=document.getElementById('cmpTblHead');
+  const body=document.getElementById('cmpTblBody');
+  const cols=results.map((r,i)=>`<th class="${LC_TEXT[i]}">${r.name}</th>`).join('');
+  head.innerHTML=`<tr><th>Metric</th>${cols}</tr>`;
+
+  const rows=[
+    {label:'Loan Amount',key:'P',fmt:v=>'₹'+fmt(v),best:'min'},
+    {label:'Rate (p.a.)',key:'r',fmt:v=>v.toFixed(2)+'%',best:'min'},
+    {label:'Tenure',key:'N',fmt:v=>v+'mo',best:'min'},
+    {label:'Monthly EMI',key:'emi',fmt:v=>'₹'+fmt(v),best:'min'},
+    {label:'Total Interest',key:'totalInt',fmt:v=>'₹'+fmt(v),best:'min'},
+    {label:'Total Payment',key:'totalPay',fmt:v=>'₹'+fmt(v),best:'min'},
+  ];
+
+  body.innerHTML=rows.map(row=>{
+    const vals=results.map(r=>r[row.key]);
+    const bestVal=row.best==='min'?Math.min(...vals):Math.max(...vals);
+    const worstVal=row.best==='min'?Math.max(...vals):Math.min(...vals);
+    const cells=results.map((r,i)=>{
+      const v=r[row.key];
+      let cls='';
+      if(vals.length>1&&v===bestVal) cls=`best ${LC_TEXT[i]}`;
+      else if(vals.length>1&&v===worstVal) cls='worst';
+      return`<td class="${cls}">${row.fmt(v)}</td>`;
+    }).join('');
+    const isWinner=row.key==='totalInt';
+    return`<tr${isWinner?' class="hi-row"':''}><td>${row.label}</td>${cells}</tr>`;
+  }).join('');
+
+  // bar charts
+  function renderBars(containerId,vals,labels,fmtFn){
+    const maxV=Math.max(...vals)||1;
+    const container=document.getElementById(containerId);
+    container.innerHTML=vals.map((v,i)=>`
+      <div class="bar-row">
+        <div class="bar-name">${labels[i]}</div>
+        <div class="bar-track"><div class="bar-fill ${LC_BAR[i]}" style="width:${(v/maxV*100).toFixed(1)}%"></div></div>
+        <div class="bar-val">${fmtFn(v)}</div>
+      </div>`).join('');
+  }
+  const names=results.map(r=>r.name);
+  renderBars('barsEmi',results.map(r=>r.emi),names,v=>'₹'+fmt(v));
+  renderBars('barsInt',results.map(r=>r.totalInt),names,v=>'₹'+fmt(v));
+  renderBars('barsTot',results.map(r=>r.totalPay),names,v=>'₹'+fmt(v));
+
+  // savings callout
+  document.getElementById('cmpSavInt').textContent='₹'+fmt(maxInt-minInt);
+  document.getElementById('cmpSavEmi').textContent='₹'+fmt(maxEmi-minEmi)+' / mo';
+  document.getElementById('cmpSavTot').textContent='₹'+fmt(maxTot-minTot);
+
+  document.getElementById('cmpres').classList.remove('hide');
+  document.getElementById('cmpres').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function clearCmp(){
+  loanCount=2;
+  buildLoanCards();
+  document.getElementById('cSharedAmt').value='';
+  document.getElementById('shareAmt').checked=true;
+  syncSharedAmt();
+  document.getElementById('cmpres').classList.add('hide');
+  document.getElementById('cmperr').classList.add('hide');
+}
+
+// ══════════════════════════════════════════════════════════
+// LOAN LEDGER
+// ══════════════════════════════════════════════════════════
+const LDG_KEY='fcp_ledger';
+
+function ldgLoad(){return JSON.parse(localStorage.getItem(LDG_KEY)||'[]')}
+function ldgSave(d){localStorage.setItem(LDG_KEY,JSON.stringify(d))}
+
+function ldgFmt(n){
+  if(isNaN(n)||n===null)return'—';
+  n=Math.round(n);
+  let s=Math.abs(n).toString(),r='';
+  if(s.length>3){r=','+s.slice(-3);s=s.slice(0,-3);while(s.length>2){r=','+s.slice(-2)+r;s=s.slice(0,-2);}r=s+r;}else r=s;
+  return(n<0?'-':'')+'₹'+r;
+}
+
+function ldgCalcInterest(principal,rate,rtype,fromDate,toDate){
+  const d=Math.max(0,(new Date(toDate)-new Date(fromDate))/(1000*60*60*24));
+  const m=d/30;
+  if(rtype==='rs100') return (principal/100)*rate*m;
+  if(rtype==='pctm')  return (principal*rate*m)/100;
+  // pct per annum
+  return (principal*rate*m)/(12*100);
+}
+
+function ldgAccrued(loan){
+  // interest since last payment (or start date) to today
+  const today=new Date().toISOString().slice(0,10);
+  const payments=loan.payments||[];
+  // find last interest-only or borrow event
+  const lastReset=[...payments].reverse().find(p=>p.type==='interest'||p.type==='borrow');
+  const fromDate=lastReset?lastReset.date:loan.startDate;
+  return ldgCalcInterest(loan.principal,loan.rate,loan.rtype,fromDate,today);
+}
+
+function ldgOutstanding(loan){
+  return loan.principal + ldgAccrued(loan);
+}
+
+function ldgRateLbl(loan){
+  if(loan.rtype==='rs100') return loan.rate+' per ₹100/mo';
+  if(loan.rtype==='pctm')  return loan.rate+'% p.m.';
+  return loan.rate+'% p.a.';
+}
+
+// ── Filter state ──
+let _ldgFilter='all';
+function ldgSetFilter(btn){
+  _ldgFilter=btn.dataset.f;
+  document.querySelectorAll('.ldg-filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  ldgRender();
+}
+
+// ── Summary dashboard ──
+let _summaryOpen=true;
+function toggleSummary(){
+  _summaryOpen=!_summaryOpen;
+  document.getElementById('ldgSummaryBody').style.display=_summaryOpen?'grid':'none';
+  document.getElementById('ldgSummaryToggle').textContent=_summaryOpen?'▲':'▼';
+}
+function ldgUpdateSummary(loans){
+  let owes=0,owed=0,borrowed=0,lent=0,intPaid=0,intRcvd=0;
+  loans.forEach(loan=>{
+    const isLender=loan.role==='lender';
+    const origP=loan.originalPrincipal||loan.principal;
+    const accrued=loan.status==='open'?ldgAccrued(loan):0;
+    const outstanding=loan.principal+accrued;
+    if(isLender){lent+=origP;if(loan.status==='open')owed+=outstanding;}
+    else{borrowed+=origP;if(loan.status==='open')owes+=outstanding;}
+    (loan.payments||[]).forEach(p=>{
+      if(p.type==='interest'){if(isLender)intRcvd+=p.amount;else intPaid+=p.amount;}
+    });
+  });
+  document.getElementById('sOwes').textContent=ldgFmt(owes);
+  document.getElementById('sOwed').textContent=ldgFmt(owed);
+  document.getElementById('sBorrowed').textContent=ldgFmt(borrowed);
+  document.getElementById('sLent').textContent=ldgFmt(lent);
+  document.getElementById('sIntPaid').textContent=ldgFmt(intPaid);
+  document.getElementById('sIntRcvd').textContent=ldgFmt(intRcvd);
+}
+
+// ── Render ──
+function ldgRender(){
+  const allLoans=ldgLoad();
+  ldgUpdateSummary(allLoans);
+  const search=(document.getElementById('ldgSearch')?.value||'').toLowerCase().trim();
+  const loans=allLoans.filter(loan=>{
+    if(_ldgFilter==='open'&&loan.status!=='open') return false;
+    if(_ldgFilter==='closed'&&loan.status!=='closed') return false;
+    if(_ldgFilter==='borrower'&&loan.role==='lender') return false;
+    if(_ldgFilter==='lender'&&loan.role!=='lender') return false;
+    if(search&&!loan.lenderName.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const el=document.getElementById('ldgList');
+  if(!loans.length){
+    el.innerHTML=`<div class="ldg-empty"><div class="ldg-ei">${allLoans.length?'🔍':'📒'}</div>${allLoans.length?'No loans match your search/filter.':'No loans yet.<br>Tap <strong>+ Add Loan</strong> to get started.'}</div>`;
+    return;
+  }
+
+  el.innerHTML=loans.map(loan=>{
+    const idx=allLoans.indexOf(loan);
+    const isLender=loan.role==='lender';
+    const origP=loan.originalPrincipal||loan.principal;
+    const accrued=loan.status==='open'?ldgAccrued(loan):0;
+    const outstanding=loan.status==='open'?loan.principal+accrued:0;
+    const payments=loan.payments||[];
+    const lastReset=[...payments].reverse().find(p=>p.type==='interest'||p.type==='borrow');
+    const fromDate=lastReset?lastReset.date:loan.startDate;
+    const today=new Date().toISOString().slice(0,10);
+    const accruedDays=Math.round((new Date(today)-new Date(fromDate))/(1000*60*60*24));
+
+    const histRows=payments.map((p,pi)=>{
+      const isLast=pi===payments.length-1;
+      const isPairedPrincipal=pi===payments.length-2&&
+        payments[pi+1].type==='principal'&&p.type==='interest'&&payments[pi+1].date===p.date;
+      const canDel=(isLast||isPairedPrincipal)&&p.type!=='borrow';
+      return`<div class="hist-row">
+        <div>
+          <span class="hist-type ${p.type}">${p.type==='borrow'?'Borrowed':p.type==='interest'?'Interest Paid':p.type==='principal'?'Principal ↓':'Closed'}</span>
+          <div class="hist-date">${p.date}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div><div class="hist-amt">${ldgFmt(p.amount)}</div>${p.note?`<div class="hist-note">${p.note}</div>`:''}</div>
+          ${canDel?`<button onclick="ldgDeletePayment(${idx},${pi})" style="background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer">🗑</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+
+    const roleTag=isLender
+      ?`<span class="loan-role-tag lender">🤝 You Lent</span>`
+      :`<span class="loan-role-tag borrower">🙋 You Borrowed</span>`;
+    const outstandingClass=isLender?'grn':'red';
+    const outstandingLbl=isLender?'Receivable':'Outstanding';
+
+    return`<div class="loan-card ${loan.role||'borrower'}${loan.status==='closed'?' closed':''}">
+      <div class="loan-head">
+        <div>${roleTag}<div class="loan-name">${loan.lenderName}</div><div class="loan-meta">Since ${loan.startDate} · ${ldgRateLbl(loan)}</div></div>
+        <span class="loan-badge ${loan.status}">${loan.status==='open'?'Open':'Closed'}</span>
+      </div>
+      ${loan.note?`<div class="loan-card-note">📌 ${loan.note}</div>`:''}
+      <div class="loan-stats">
+        <div class="loan-stat"><div class="loan-stat-lbl">Principal</div><div class="loan-stat-val">${ldgFmt(origP)}</div>${origP!==loan.principal?`<div class="ldg-accrued" style="color:var(--grn)">Now: ${ldgFmt(loan.principal)}</div>`:''}</div>
+        <div class="loan-stat"><div class="loan-stat-lbl">Accrued Interest</div><div class="loan-stat-val gld">${loan.status==='open'?ldgFmt(accrued):'—'}</div>${loan.status==='open'?`<div class="ldg-accrued">Since ${fromDate} · ${accruedDays}d</div>`:''}</div>
+        <div class="loan-stat"><div class="loan-stat-lbl">${outstandingLbl}</div><div class="loan-stat-val ${outstandingClass}">${loan.status==='open'?ldgFmt(outstanding):'—'}</div></div>
+        <div class="loan-stat"><div class="loan-stat-lbl">Payments</div><div class="loan-stat-val grn">${payments.filter(p=>p.type!=='borrow').length}</div></div>
+      </div>
+      ${loan.status==='open'?`
+      <div class="loan-actions">
+        <button class="la-btn pay" onclick="openPayModal(${idx})">💸 Pay</button>
+        <button class="la-btn wa"  onclick="ldgShareWA(${idx})">💬 WA</button>
+        <button class="la-btn cp"  onclick="ldgCopy(${idx})">📋 Copy</button>
+        <button class="la-btn" style="background:#ede9fe;color:#6d28d9;border:1.5px solid rgba(109,40,217,.2);flex:0.6" onclick="openEditModal(${idx})">✏️</button>
+        <button class="la-btn del" style="flex:0.5" onclick="ldgDelete(${idx})">🗑</button>
+      </div>`:`
+      <div class="loan-actions">
+        <button class="la-btn wa" onclick="ldgShareWA(${idx})">💬 WA</button>
+        <button class="la-btn cp" onclick="ldgCopy(${idx})">📋 Copy</button>
+        <button class="la-btn del" onclick="ldgDelete(${idx})">🗑 Remove</button>
+      </div>`}
+      ${payments.length?`<div class="loan-hist-toggle" onclick="this.nextElementSibling.classList.toggle('hide');this.textContent=this.nextElementSibling.classList.contains('hide')?'▼ Show History (${payments.length})':'▲ Hide History'">▼ Show History (${payments.length})</div><div class="loan-hist hide">${histRows}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── Add / Edit Loan Modal ──
+let _mlRole='borrower';
+function setLoanRole(role){
+  _mlRole=role;
+  document.getElementById('ml-role-borrower').classList.toggle('on',role==='borrower');
+  document.getElementById('ml-role-lender').classList.toggle('on',role==='lender');
+  document.getElementById('ml-namelbl').textContent=role==='lender'?'Borrower Name':'Lender Name';
+  document.getElementById('ml-datelbl').textContent=role==='lender'?'Lend Date':'Borrow Date';
+}
+function ldgFmtInput(el){
+  let raw=el.value.replace(/[^\d]/g,'');
+  if(!raw){el.value='';return;}
+  let n=parseInt(raw,10),s=n.toString(),r='';
+  if(s.length>3){r=','+s.slice(-3);s=s.slice(0,-3);while(s.length>2){r=','+s.slice(-2)+r;s=s.slice(0,-2);}r=s+r;}else r=s;
+  const cur=el.selectionStart,old=el.value.length;
+  el.value=r;
+  const diff=el.value.length-old;
+  try{el.setSelectionRange(cur+diff,cur+diff);}catch(e){}
+}
+
+function updMlRlbl(){
+  const v=document.getElementById('ml-rtype').value;
+  const lbl=v==='rs100'?'Rate (₹ per ₹100 / month)':v==='pctm'?'Rate (% per Month)':'Rate (% per Annum)';
+  document.getElementById('ml-rlbl').textContent=lbl;
+}
+
+function openAddModal(){
+  document.getElementById('ml-editid').value='';
+  document.getElementById('ml-title').textContent='➕ New Loan';
+  document.getElementById('ml-savebtn').textContent='Save Loan';
+  document.getElementById('ml-name').value='';
+  document.getElementById('ml-amt').value='';
+  document.getElementById('ml-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ml-rtype').value='rs100';
+  document.getElementById('ml-rate').value='';
+  document.getElementById('ml-note').value='';
+  document.getElementById('ml-err').classList.add('hide');
+  setLoanRole('borrower');
+  updMlRlbl();
+  document.getElementById('addModal').classList.remove('hide');
+}
+
+function openEditModal(idx){
+  const loans=ldgLoad();
+  const loan=loans[idx];
+  if(!loan)return;
+  document.getElementById('ml-editid').value=loan.id;
+  document.getElementById('ml-title').textContent='✏️ Edit Loan';
+  document.getElementById('ml-savebtn').textContent='Update Loan';
+  document.getElementById('ml-name').value=loan.lenderName;
+  // format principal with commas
+  const p=Math.round(loan.principal);
+  let s=p.toString(),r='';
+  if(s.length>3){r=','+s.slice(-3);s=s.slice(0,-3);while(s.length>2){r=','+s.slice(-2)+r;s=s.slice(0,-2);}r=s+r;}else r=s;
+  document.getElementById('ml-amt').value=r;
+  document.getElementById('ml-date').value=loan.startDate;
+  document.getElementById('ml-rtype').value=loan.rtype||'rs100';
+  document.getElementById('ml-rate').value=loan.rate;
+  document.getElementById('ml-note').value=loan.note||'';
+  document.getElementById('ml-err').classList.add('hide');
+  setLoanRole(loan.role||'borrower');
+  updMlRlbl();
+  document.getElementById('addModal').classList.remove('hide');
+}
+
+function closeAddModal(){document.getElementById('addModal').classList.add('hide')}
+
+function saveLoan(){
+  const editId=document.getElementById('ml-editid').value;
+  const name=document.getElementById('ml-name').value.trim();
+  const amt=parseFloat(document.getElementById('ml-amt').value.replace(/,/g,''));
+  const date=document.getElementById('ml-date').value;
+  const rtype=document.getElementById('ml-rtype').value;
+  const rate=parseFloat(document.getElementById('ml-rate').value);
+  const note=document.getElementById('ml-note').value.trim();
+  const errEl=document.getElementById('ml-err');
+
+  if(!name){errEl.textContent='Enter lender name';errEl.classList.remove('hide');return}
+  if(!amt||amt<=0){errEl.textContent='Enter a valid amount';errEl.classList.remove('hide');return}
+  if(!date){errEl.textContent='Select borrow date';errEl.classList.remove('hide');return}
+  if(!rate||rate<=0){errEl.textContent='Enter interest rate';errEl.classList.remove('hide');return}
+
+  const loans=ldgLoad();
+
+  if(editId){
+    // Edit mode — update existing record, preserve payments and status
+    const idx=loans.findIndex(l=>l.id===editId);
+    if(idx===-1){errEl.textContent='Loan not found';errEl.classList.remove('hide');return}
+    if(!confirm('Update this loan? Rate and principal changes will affect future interest calculations.'))return;
+    loans[idx]={...loans[idx],lenderName:name,principal:amt,originalPrincipal:amt,startDate:date,rtype,rate,note,role:_mlRole};
+    // update borrow entry date/amount to match
+    if(loans[idx].payments&&loans[idx].payments[0]&&loans[idx].payments[0].type==='borrow'){
+      loans[idx].payments[0].amount=amt;
+      loans[idx].payments[0].date=date;
+    }
+  } else {
+    // New loan
+    const id='ldg_'+Date.now();
+    loans.unshift({
+      id,lenderName:name,principal:amt,originalPrincipal:amt,startDate:date,
+      rtype,rate,note,status:'open',role:_mlRole,
+      payments:[{type:'borrow',date,amount:amt,note:note||''}]
+    });
+  }
+
+  ldgSave(loans);
+  closeAddModal();
+  ldgRender();
+  showToast(editId?'✓ Loan updated':'✓ Loan saved');
+}
+
+// ── Pay Modal ──
+let _pmType='interest';
+function setPmType(t,btn){
+  _pmType=t;
+  document.querySelectorAll('#payModal .sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const isFull=t==='full';
+  document.getElementById('pm-principal-row').style.display=isFull?'':'none';
+  document.getElementById('pm-extraprincipal-row').style.display=isFull?'none':'';
+  document.getElementById('pm-extraprincipal').value='';
+  ldgRefreshPayCalc();
+}
+
+function openPayModal(idx){
+  const loans=ldgLoad();
+  const loan=loans[idx];
+  _pmType='interest';
+  document.getElementById('pm-id').value=idx;
+  document.getElementById('pm-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('pm-note').value='';
+  document.getElementById('pm-extraprincipal').value='';
+  document.getElementById('pm-err').classList.add('hide');
+  document.getElementById('pm-t-int').classList.add('on');
+  document.getElementById('pm-t-full').classList.remove('on');
+  document.getElementById('pm-principal-row').style.display='none';
+  document.getElementById('pm-extraprincipal-row').style.display='';
+  document.getElementById('pm-principal').value=Math.round(loan.principal);
+  ldgRefreshPayCalc();
+  document.getElementById('payModal').classList.remove('hide');
+}
+
+function ldgRefreshPayCalc(){
+  const idx=parseInt(document.getElementById('pm-id').value);
+  if(isNaN(idx))return;
+  const loans=ldgLoad();
+  const loan=loans[idx];
+  if(!loan)return;
+  const toDate=document.getElementById('pm-date').value||new Date().toISOString().slice(0,10);
+  const payments=loan.payments||[];
+  const lastReset=[...payments].reverse().find(p=>p.type==='interest'||p.type==='borrow');
+  const fromDate=lastReset?lastReset.date:loan.startDate;
+  const accrued=ldgCalcInterest(loan.principal,loan.rate,loan.rtype,fromDate,toDate);
+  const accruedRounded=Math.round(accrued);
+  document.getElementById('pm-int').value=accruedRounded;
+  const pmDays=Math.round((new Date(toDate)-new Date(fromDate))/(1000*60*60*24));
+  document.getElementById('pm-accrued-note').textContent=`From ${fromDate} to ${toDate} · ${pmDays} days`;
+
+  if(_pmType==='full'){
+    document.getElementById('pm-amt').value=Math.round(loan.principal+accrued);
+    document.getElementById('pm-principal').value=Math.round(loan.principal);
+    document.getElementById('pm-principal-after').textContent='';
+  } else {
+    const extra=parseFloat(document.getElementById('pm-extraprincipal').value)||0;
+    const remaining=loan.principal-extra;
+    document.getElementById('pm-amt').value=accruedRounded+Math.round(extra);
+    if(extra>0){
+      document.getElementById('pm-principal-after').textContent=
+        remaining<=0
+          ? '⚠ Exceeds principal — use Full Closure instead'
+          : `Principal after payment: ${ldgFmt(remaining)}`;
+      document.getElementById('pm-principal-after').style.color=remaining<=0?'var(--red)':'var(--grn)';
+    } else {
+      document.getElementById('pm-principal-after').textContent='';
+    }
+  }
+}
+
+document.getElementById('pm-date').addEventListener('change',ldgRefreshPayCalc);
+
+function closePayModal(){document.getElementById('payModal').classList.add('hide')}
+
+function savePayment(){
+  const idx=parseInt(document.getElementById('pm-id').value);
+  const date=document.getElementById('pm-date').value;
+  const amount=parseFloat(document.getElementById('pm-amt').value);
+  const extra=parseFloat(document.getElementById('pm-extraprincipal').value)||0;
+  const note=document.getElementById('pm-note').value.trim();
+  const errEl=document.getElementById('pm-err');
+
+  if(!date){errEl.textContent='Select payment date';errEl.classList.remove('hide');return}
+  if(!amount||amount<=0){errEl.textContent='Enter amount paid';errEl.classList.remove('hide');return}
+
+  const loans=ldgLoad();
+  const loan=loans[idx];
+
+  if(_pmType==='interest'&&extra>0&&extra>=loan.principal){
+    errEl.textContent='Extra amount equals or exceeds principal — use Full Closure instead';
+    errEl.classList.remove('hide');return;
+  }
+
+  if(_pmType==='full'){
+    if(!confirm('Mark this loan as fully closed? This cannot be undone.'))return;
+  } else {
+    const extraMsg=extra>0?` and reduce principal by ${ldgFmt(extra)}`:'';
+    if(!confirm(`Record interest payment of ${ldgFmt(Math.round(amount-extra))}${extraMsg}? The interest clock will reset from this date.`))return;
+  }
+
+  // record interest payment (amount is total paid; subtract extra principal to get interest only)
+  loan.payments.push({type:'interest',date,amount:Math.round(amount-extra),note});
+
+  // reduce principal if extra was paid
+  if(_pmType==='interest'&&extra>0){
+    loan.principal=Math.round(loan.principal-extra);
+    loan.payments.push({type:'principal',date,amount:extra,note:'Principal reduction'});
+  }
+
+  if(_pmType==='full') loan.status='closed';
+
+  ldgSave(loans);
+  closePayModal();
+  ldgRender();
+  showToast(_pmType==='full'?'✓ Loan closed':'✓ Payment recorded');
+}
+
+// ── Share / Copy ──
+function ldgBuildMsg(loan){
+  const isLender=loan.role==='lender';
+  const accrued=loan.status==='open'?ldgAccrued(loan):0;
+  const outstanding=loan.principal+accrued;
+  const payments=loan.payments||[];
+  const lastReset=[...payments].reverse().find(p=>p.type==='interest'||p.type==='borrow');
+  const fromDate=lastReset?lastReset.date:loan.startDate;
+  const today=new Date().toISOString().slice(0,10);
+
+  const payLines=payments.filter(p=>p.type!=='borrow').map(p=>
+    `  • ${p.type==='interest'?'Interest Paid':p.type==='principal'?'Principal ↓':'Closed'}: ${ldgFmt(p.amount)} on ${p.date}`
+  ).join('\n');
+
+  return`📒 *Loan Statement*
+━━━━━━━━━━━━━━━━
+${isLender?`🤝 You Lent to: *${loan.lenderName}*`:`🙋 Borrowed from: *${loan.lenderName}*`}
+📅 Since: ${loan.startDate}
+💰 Principal: ${ldgFmt(loan.principal)}
+📈 Rate: ${ldgRateLbl(loan)}
+${loan.note?`📌 Purpose: ${loan.note}\n`:''}━━━━━━━━━━━━━━━━
+📊 Accrued Interest: ${ldgFmt(accrued)}
+   (From ${fromDate} to ${today})
+${isLender?`✅ Total Receivable: *${ldgFmt(outstanding)}*`:`⚠️ Total Outstanding: *${ldgFmt(outstanding)}*`}
+━━━━━━━━━━━━━━━━
+${payLines?`Payment History:\n${payLines}`:'No payments yet'}
+━━━━━━━━━━━━━━━━
+Status: ${loan.status==='open'?'🟢 Open':'🔴 Closed'}`;
+}
+
+function ldgShareWA(idx){
+  const loans=ldgLoad();
+  const msg=ldgBuildMsg(loans[idx]);
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function ldgCopy(idx){
+  const loans=ldgLoad();
+  const msg=ldgBuildMsg(loans[idx]);
+  navigator.clipboard.writeText(msg).then(()=>showToast('✓ Copied!')).catch(()=>showToast('Copy failed'));
+}
+
+// ── Delete ──
+function ldgDelete(idx){
+  const loans=ldgLoad();
+  const loan=loans[idx];
+  if(!confirm(`Delete "${loan.lenderName}" loan and all its payment history? This cannot be undone.`))return;
+  loans.splice(idx,1);
+  ldgSave(loans);
+  ldgRender();
+  showToast('✓ Loan deleted');
+}
+
+function ldgDeletePayment(loanIdx,payIdx){
+  const loans=ldgLoad();
+  const loan=loans[loanIdx];
+  const payments=loan.payments;
+  const entry=payments[payIdx];
+
+  if(!entry||entry.type==='borrow'){showToast('Cannot delete this entry');return;}
+
+  // re-check pairing fresh at delete time
+  const hasPairedPrincipal=
+    entry.type==='interest'&&
+    payments[payIdx+1]&&
+    payments[payIdx+1].type==='principal'&&
+    payments[payIdx+1].date===entry.date;
+
+  const label=entry.type==='interest'?'Interest Paid':entry.type==='principal'?'Principal ↓':'Closed';
+  const extra=hasPairedPrincipal?` and the paired Principal ↓ of ${ldgFmt(payments[payIdx+1].amount)}`:'';
+
+  if(!confirm(`Delete "${label}" of ${ldgFmt(entry.amount)} on ${entry.date}${extra}?`))return;
+
+  if(hasPairedPrincipal){
+    loan.principal+=payments[payIdx+1].amount; // restore principal
+    payments.splice(payIdx,2);                 // remove both
+  } else if(entry.type==='principal'){
+    loan.principal+=entry.amount;              // restore principal
+    payments.splice(payIdx,1);
+  } else if(entry.type==='full'||loan.status==='closed'){
+    loan.status='open';                        // reopen loan
+    payments.splice(payIdx,1);
+  } else {
+    payments.splice(payIdx,1);
+  }
+
+  ldgSave(loans);
+  ldgRender();
+  showToast('✓ Entry deleted');
+}
+
+// ── Export ──
+function ldgExport(){
+  const loans=ldgLoad();
+  if(!loans.length){showToast('No loans to export');return}
+  const blob=new Blob([JSON.stringify(loans,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=new Date().toISOString().slice(0,10)+'_loan_ledger.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('✓ Exported');
+}
+
+// ── Import ──
+function ldgImport(){document.getElementById('ldgImportFile').click()}
+function ldgImportFile(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!Array.isArray(data))throw new Error('Invalid');
+      const existing=ldgLoad();
+      const seen=new Set(existing.map(l=>l.id));
+      const merged=[...existing,...data.filter(l=>!seen.has(l.id))];
+      ldgSave(merged);
+      ldgRender();
+      showToast(`✓ Imported ${data.length} loan(s)`);
+    }catch{showToast('Import failed — invalid file')}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('isd').value=todayStr();
+  document.getElementById('effrow').classList.add('hide');
+  updRlbl();
+  buildLoanCards();
+  ldgRender();
+});
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     LEASE FINANCE PRO — Script
+     ══════════════════════════════════════════════════════════ -->
+<script>
+
+const HIST_KEY='lfp_history';
+const APP_VERSION='1.9';
+// REPLACED_MARKER — full rewrite below
+
+function loadHist(){return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}
+function saveHist(h){localStorage.setItem(HIST_KEY,JSON.stringify(h))}
+
+function pushHist(entry){
+  let h=loadHist();
+  h.unshift(entry);
+  if(h.length>50)h=h.slice(0,50);
+  saveHist(h);
+  updHistBadge();
+  if(document.getElementById('histDrawer').classList.contains('open'))renderHistList();
+}
+
+function updHistBadge(){
+  document.getElementById('histCount').textContent=loadHist().length;
+}
+
+function openHist(){
+  renderHistList();
+  document.getElementById('histOverlay').classList.add('open');
+  document.getElementById('histDrawer').classList.add('open');
+}
+
+function closeHist(){
+  document.getElementById('histOverlay').classList.remove('open');
+  document.getElementById('histDrawer').classList.remove('open');
+}
+
+function clearAllHist(){
+  if(!confirm('Clear all saved invoices?'))return;
+  localStorage.removeItem(HIST_KEY);
+  updHistBadge();
+  renderHistList();
+}
+
+function exportHist(){
+  const h=loadHist();
+  if(!h.length){alert('No invoices to export.');return;}
+  const blob=new Blob([JSON.stringify(h,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=new Date().toISOString().slice(0,10)+'_lease_invoices.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importHist(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!Array.isArray(data))throw new Error('Invalid format');
+      const existing=loadHist();
+      const seen=new Set();
+      const merged=[...data,...existing];
+      const deduped=merged.filter(item=>{
+        const key=`${item.land}_${item.year}_${item.date}_${item.final}`;
+        if(seen.has(key))return false;
+        seen.add(key);return true;
+      }).slice(0,50);
+      saveHist(deduped);
+      updHistBadge();
+      renderHistList();
+      alert(`Imported ${data.length} invoice(s). Total: ${deduped.length}`);
+    }catch(err){
+      alert('Import failed — invalid file format.');
+    }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+let _delPending=null;
+function deleteHistItem(idx){
+  const h=loadHist();
+  const e=h[idx];
+  if(!e)return;
+  _delPending={idx,entry:e};
+  const t=document.getElementById('delToast');
+  t.querySelector('.toast-msg').textContent='Delete "'+(e.lessee||'—')+' · '+(e.year||'—')+'"?';
+  t.classList.add('show');
+}
+function confirmDelete(){
+  document.getElementById('delToast').classList.remove('show');
+  if(!_delPending)return;
+  const h=loadHist();
+  h.splice(_delPending.idx,1);
+  saveHist(h);
+  updHistBadge();
+  renderHistList();
+  _delPending=null;
+}
+function cancelDelete(){
+  document.getElementById('delToast').classList.remove('show');
+  _delPending=null;
+}
+
+function renderHistList(){
+  const h=loadHist();
+  const el=document.getElementById('histList');
+  if(!h.length){
+    el.innerHTML='<div class="hist-empty">No saved invoices yet.<br>Generate one to save it here.</div>';
+    return;
+  }
+  el.innerHTML=h.map((e,i)=>{
+    const paid=e.paid||{};
+    const isHalf=e.payMode==='half';
+    const paidDots=isHalf
+      ?`<span class="hist-paid-dot${paid.first?' paid':''}" title="1st Half${paid.first&&paid.firstDate?' · '+fmtDate(paid.firstDate):''}"></span><span class="hist-paid-dot${paid.second?' paid':''}" title="2nd Half${paid.second&&paid.secondDate?' · '+fmtDate(paid.secondDate):''}"></span>`
+      :`<span class="hist-paid-dot${paid.full?' paid':''}" title="${paid.full?'Paid'+(paid.fullDate?' · '+fmtDate(paid.fullDate):''):'Unpaid'}"></span>`;
+    return `<div class="hitem" onclick="loadHistItem(${i})">
+      <div class="hitem-top">
+        <div style="flex:1">
+          <div class="hitem-title">${e.lessee||'—'} · ${e.year||'—'} ${paidDots}</div>
+          <div style="font-size:10px;color:var(--dim);margin-top:2px">${e.land} ${e.unitLbl||e.unit} · ${isHalf?'Half Yearly':'Yearly'}</div>
+        </div>
+        <span class="hitem-date">${e.date}</span>
+      </div>
+      <div class="hitem-body">
+        <div class="hitem-stat">Rent <strong>₹${e.yearly}</strong></div>
+        <div class="hitem-stat">Payable <strong>₹${e.final}</strong></div>
+        ${e.adv?`<div class="hitem-stat">Adv <strong>₹${e.adv}</strong></div>`:''}
+      </div>
+      <div class="hitem-actions">
+        <button class="hitem-edit" onclick="event.stopPropagation();editHistItem(${i})">✏ Edit</button>
+        <button class="hitem-del" onclick="event.stopPropagation();deleteHistItem(${i})">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let _editingIdx=null;
+let _currentHistIdx=null;
+let _pendingPaidKey=null;
+
+function loadHistItem(idx){
+  _editingIdx=null;
+  _currentHistIdx=idx;
+  _loadData(idx);
+}
+
+function editHistItem(idx){
+  _editingIdx=idx;
+  _currentHistIdx=idx;
+  _loadData(idx);
+}
+
+function updateGenerateBtn(){
+  const btn=document.querySelector('#t-lease .cbtn');
+  if(!btn)return;
+  btn.textContent=_editingIdx!==null?'💾 Update Invoice':'Generate Invoice';
+}
+
+function _loadData(idx){
+  const e=loadHist()[idx];
+  if(!e)return;
+  const hasData=
+    document.getElementById('lessee').value.trim()||
+    document.getElementById('land').value.trim()||
+    document.getElementById('year').value.trim()||
+    document.getElementById('out').innerHTML.trim();
+  if(hasData&&!confirm('Load this invoice? Current fields and results will be overwritten.'))return;
+
+  document.getElementById('lessee').value=e.lessee||'';
+  document.getElementById('land').value=e.land||'';
+  document.getElementById('unit').value=e.unit||'kanal';
+  document.getElementById('year').value=e.year==='—'?'':e.year;
+  document.getElementById('rate').value=e.rate||'1,00,000';
+  fmtRate(document.getElementById('rate'));
+  document.getElementById('mode').value=e.payMode||'yearly';
+  document.getElementById('it').value=e.it||'rs100';
+  document.getElementById('lfp_ir').value=e.ir||'';
+
+  document.getElementById('adv').innerHTML='';
+  const rows=e.advRows||[];
+  document.getElementById('advInterestCard').classList.toggle('hide',rows.length===0);
+  if(rows.length===0){
+    // no advances — leave empty
+  } else {
+    rows.forEach(r=>{
+      const d=document.createElement('div');
+      d.className='adv-card';
+      d.innerHTML=_advCardHtml(r.amt||'',r.s||'',r.e||'',(r.comment||'').replace(/"/g,'&quot;'),r.chargeInterest!==false);
+      document.getElementById('adv').appendChild(d);
+      // Map old 'split' or 'none' entries → 'none' (Both Halves); preserve 'first'/'second'
+      const rawMode=r.mode||(e.advMode||'second');
+      d.querySelector('.adv-mode').value=(rawMode==='split'||rawMode==='none')?'none':rawMode;
+      d.querySelector('.adv-interest-chk').checked=r.chargeInterest!==false;
+      fmtRate(d.querySelector('.adv-amt'));
+    });
+  }
+
+  document.getElementById('out').innerHTML=e.html||'';
+  document.getElementById('out').classList.remove('stale');
+  _leaseGenerated=true;
+  closeHist();
+  updateGenerateBtn();
+  renderPaidBar();
+  setTimeout(()=>document.getElementById('out').scrollIntoView({behavior:'smooth',block:'nearest'}),300);
+}
+
+let _leaseGenerated=false;
+
+function markStale(){
+  if(!_leaseGenerated)return;
+  document.getElementById("out").classList.add("stale");
+}
+
+function _advCardHtml(amt,s,e,comment,chargeInterest){
+  if(chargeInterest===undefined)chargeInterest=true;
+  return `<div style="display:flex;gap:7px;align-items:flex-end;margin-bottom:8px">
+  <div style="flex:1.2">
+    <div class="adv-label">Amount (₹)</div>
+    <input type="text" inputmode="numeric" class="if adv-amt" placeholder="0" oninput="fmtRate(this);markStale()" value="${amt}">
+  </div>
+  <div style="flex:1.2">
+    <div class="adv-label">Deduct From (Half Yearly)</div>
+    <select class="if adv-mode" onchange="markStale()">
+      <option value="second">2nd Half Only</option>
+      <option value="first">1st Half Only</option>
+      <option value="none">Both Halves</option>
+    </select>
+  </div>
+  <button class="adv-del" onclick="this.closest('.adv-card').remove();onAdvRemoved()">✕</button>
+</div>
+<div style="margin-bottom:8px">
+  <div class="adv-label">Comment / Note (optional)</div>
+  <input type="text" class="if adv-comment" placeholder="e.g. For seeds, machinery rent…" oninput="markStale()" value="${comment}">
+</div>
+<div style="display:flex;gap:7px;margin-bottom:8px">
+  <div style="flex:1">
+    <div class="adv-label">From Date</div>
+    <input type="date" class="if adv-start" onchange="markStale()" value="${s}">
+  </div>
+  <div style="flex:1">
+    <div class="adv-label">To Date</div>
+    <input type="date" class="if adv-end" onchange="markStale()" value="${e}">
+  </div>
+</div>
+<label class="adv-interest-lbl">
+  <input type="checkbox" class="adv-interest-chk" ${chargeInterest?'checked':''} onchange="markStale()">
+  Charge Interest on this advance
+</label>`;
+}
+
+function addAdv(){
+  const d=document.createElement("div");
+  d.className="adv-card";
+  const today=new Date().toISOString().slice(0,10);
+  d.innerHTML=_advCardHtml('',today,today,'');
+  document.getElementById("adv").appendChild(d);
+  document.getElementById("advInterestCard").classList.remove("hide");
+}
+
+function onAdvRemoved(){
+  markStale();
+  if(!document.querySelectorAll('.adv-card').length)
+    document.getElementById("advInterestCard").classList.add("hide");
+}
+
+function leaseDays(d1,d2){
+  return Math.max(0,(new Date(d2)-new Date(d1))/(1000*60*60*24));
+}
+
+function fmtRate(el){
+  let raw=el.value.replace(/[^\d]/g,'');
+  if(!raw){el.value='';return;}
+  let n=parseInt(raw,10);
+  let s=n.toString();
+  let result='';
+  if(s.length>3){
+    result=','+s.slice(-3);s=s.slice(0,-3);
+    while(s.length>2){result=','+s.slice(-2)+result;s=s.slice(0,-2);}
+    result=s+result;
+  } else result=s;
+  let cur=el.selectionStart;
+  let oldLen=el.value.length;
+  el.value=result;
+  let diff=el.value.length-oldLen;
+  el.setSelectionRange(cur+diff,cur+diff);
+}
+
+function fmtDate(d){
+  if(!d)return'';
+  try{return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+  catch(e){return d;}
+}
+
+function formatAmt(n){
+  const rounded=Math.round(n);
+  const isNeg=rounded<0;
+  const abs=Math.abs(rounded);
+  let s=abs.toString();
+  let result='';
+  if(s.length>3){
+    result=','+s.slice(-3);s=s.slice(0,-3);
+    while(s.length>2){result=','+s.slice(-2)+result;s=s.slice(0,-2);}
+    result=s+result;
+  } else result=s;
+  let label='';
+  if(abs>=100000)     label=' ('+parseFloat((abs/100000).toFixed(2))+' Lakh)';
+  else if(abs>=1000)  label=' ('+parseFloat((abs/1000).toFixed(2))+' Thousand)';
+  else if(abs>=100)   label=' ('+parseFloat((abs/100).toFixed(1))+' Hundred)';
+  return (isNeg?'-':'')+'₹'+result+label;
+}
+
+function numberToWords(num){
+  const a=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten',
+  'Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const b=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  function w(n){
+    if(n===0)return'';
+    if(n<20)return a[n]+' ';
+    if(n<100)return b[Math.floor(n/10)]+' '+w(n%10);
+    if(n<1000)return a[Math.floor(n/100)]+' Hundred '+w(n%100);
+    if(n<100000)return w(Math.floor(n/1000))+'Thousand '+w(n%1000);
+    if(n<10000000)return w(Math.floor(n/100000))+'Lakh '+w(n%100000);
+    return w(Math.floor(n/10000000))+'Crore '+w(n%10000000);
+  }
+  return (w(Math.round(num)).trim()+' Only');
+}
+
+function printOnly(){
+  if(!document.getElementById("out").innerHTML.trim()){alert("Generate an invoice first before printing.");return;}
+  window.print();
+}
+
+function shareWA(){
+  if(!document.getElementById("out").innerHTML.trim()){alert("Generate an invoice first before sharing.");return;}
+  let land=parseFloat(document.getElementById("land").value||0);
+  let unit=document.getElementById("unit").value;
+  let acres=unit==="acre"?land:land/8;
+  let kanals=(acres*8).toFixed(2);
+  let year=document.getElementById("year").value||'—';
+  let lessee=document.getElementById("lessee").value.trim()||'—';
+  let rate=parseFloat((document.getElementById("rate").value||'0').replace(/,/g,''));
+  let yearly=acres*rate;
+  let type=document.getElementById("it").value;
+  let ir=parseFloat(document.getElementById("lfp_ir").value||0);
+  let totalAdv=0,totalInt=0,advLines=[];
+  document.querySelectorAll(".adv-card").forEach(r=>{
+    let amt=parseFloat((r.querySelector('.adv-amt').value||'0').replace(/,/g,''));
+    let s=r.querySelector('.adv-start').value,e=r.querySelector('.adv-end').value;
+    let comment=r.querySelector('.adv-comment').value.trim();
+    let chkInt=r.querySelector('.adv-interest-chk').checked;
+    if(!amt||!s||!e)return;
+    let d=Math.max(0,(new Date(e)-new Date(s))/(1000*60*60*24));
+    let m=d/30;
+    let interest=chkInt?(type==="rs100"?(amt/100)*ir*m:(amt*ir*m)/(12*100)):0;
+    totalAdv+=amt;totalInt+=interest;
+    let intStr=chkInt?`Interest: ${formatAmt(Math.round(interest))}`:'No Interest';
+    let line=`  • Advance ${advLines.length+1}: ${formatAmt(amt)} | ${s} → ${e} (${Math.round(d)} days) | ${intStr}`;
+    if(comment)line+=`\n    📝 ${comment}`;
+    advLines.push(line);
+  });
+  let final=yearly-totalAdv+totalInt;
+  let payMode=document.getElementById("mode").value==="half"?"Half Yearly":"Yearly";
+  let msg=`🌾 *Lease Invoice*
+━━━━━━━━━━━━━━━━
+👤 *Lessee:* ${lessee}
+📅 *Year:* ${year}
+🏡 *Land:* ${acres.toFixed(2)} Acre (${kanals} Kanal)
+💰 *Rate:* ${formatAmt(rate)} / Acre / Year
+📆 *Payment:* ${payMode}
+━━━━━━━━━━━━━━━━
+📊 *Yearly Rent:* ${formatAmt(yearly)}
+${advLines.length?advLines.join('\n')+`\n  Total Advance: ${formatAmt(totalAdv)}\n  Total Interest: ${formatAmt(totalInt)}`:'  No advance deductions'}
+━━━━━━━━━━━━━━━━
+✅ *Final Payable: ${formatAmt(final)}*
+   ${numberToWords(final)}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function copyInvoice(){
+  if(!document.getElementById("out").innerHTML.trim()){alert("Generate an invoice first before copying.");return;}
+  let land=parseFloat(document.getElementById("land").value||0);
+  let unit=document.getElementById("unit").value;
+  let acres=unit==="acre"?land:land/8;
+  let kanals=(acres*8).toFixed(2);
+  let year=document.getElementById("year").value||'—';
+  let lessee=document.getElementById("lessee").value.trim()||'—';
+  let rate=parseFloat((document.getElementById("rate").value||'0').replace(/,/g,''));
+  let yearly=acres*rate;
+  let type=document.getElementById("it").value;
+  let ir=parseFloat(document.getElementById("lfp_ir").value||0);
+  let totalAdv=0,totalInt=0,advLines=[];
+  document.querySelectorAll(".adv-card").forEach(r=>{
+    let amt=parseFloat((r.querySelector('.adv-amt').value||'0').replace(/,/g,''));
+    let s=r.querySelector('.adv-start').value,e=r.querySelector('.adv-end').value;
+    let comment=r.querySelector('.adv-comment').value.trim();
+    let chkInt=r.querySelector('.adv-interest-chk').checked;
+    if(!amt||!s||!e)return;
+    let d=Math.max(0,(new Date(e)-new Date(s))/(1000*60*60*24));
+    let m=d/30;
+    let interest=chkInt?(type==="rs100"?(amt/100)*ir*m:(amt*ir*m)/(12*100)):0;
+    totalAdv+=amt;totalInt+=interest;
+    let intStr=chkInt?`Interest: ${formatAmt(Math.round(interest))}`:'No Interest';
+    let line=`  • Advance ${advLines.length+1}: ${formatAmt(amt)} | ${s} → ${e} (${Math.round(d)} days) | ${intStr}`;
+    if(comment)line+=`\n    📝 ${comment}`;
+    advLines.push(line);
+  });
+  let final=yearly-totalAdv+totalInt;
+  let payMode=document.getElementById("mode").value==="half"?"Half Yearly":"Yearly";
+  let msg=`🌾 Lease Invoice
+━━━━━━━━━━━━━━━━
+👤 Lessee: ${lessee}
+📅 Year: ${year}
+🏡 Land: ${acres.toFixed(2)} Acre (${kanals} Kanal)
+💰 Rate: ${formatAmt(rate)} / Acre / Year
+📆 Payment: ${payMode}
+━━━━━━━━━━━━━━━━
+📊 Yearly Rent: ${formatAmt(yearly)}
+${advLines.length?advLines.join('\n')+`\n  Total Advance: ${formatAmt(totalAdv)}\n  Total Interest: ${formatAmt(totalInt)}`:'  No advance deductions'}
+━━━━━━━━━━━━━━━━
+✅ Final Payable: ${formatAmt(final)}
+   ${numberToWords(final)}`;
+  navigator.clipboard.writeText(msg).then(()=>{
+    const btn=document.getElementById('copyBtn');
+    btn.textContent='✅ Copied!';
+    setTimeout(()=>{btn.textContent='📋 Copy';},2000);
+  }).catch(()=>alert('Copy failed — please try again.'));
+}
+
+function handleGenerate(){
+  if(_editingIdx!==null){showSaveDialog();}
+  else{calc();}
+}
+
+function showSaveDialog(){
+  document.getElementById('saveDialog').classList.add('open');
+}
+
+function closeSaveDialog(){
+  document.getElementById('saveDialog').classList.remove('open');
+}
+
+function calcNew(){
+  closeSaveDialog();
+  _editingIdx=null;
+  calc();
+}
+
+function calcUpdate(){
+  closeSaveDialog();
+  calc();
+}
+
+function calc(){
+  document.getElementById("out").classList.remove("stale");
+  _leaseGenerated=true;
+
+  const land=parseFloat(document.getElementById("land").value||0);
+  const unit=document.getElementById("unit").value;
+  const year=document.getElementById("year").value;
+  const rate=parseFloat((document.getElementById("rate").value||'0').replace(/,/g,''));
+  const acres=unit==="acre"?land:land/8;
+  const yearly=acres*rate;
+  const half=yearly/2;
+  const type=document.getElementById("it").value;
+  const ir=parseFloat(document.getElementById("lfp_ir").value||0);
+  const isHalf=document.getElementById("mode").value==="half";
+
+  let totalAdv=0,totalInt=0,advList=[];
+  document.querySelectorAll(".adv-card").forEach(r=>{
+    const amt=parseFloat((r.querySelector('.adv-amt').value||'0').replace(/,/g,''));
+    if(!amt)return;
+    const s=r.querySelector('.adv-start').value;
+    const e=r.querySelector('.adv-end').value;
+    const chargeInterest=r.querySelector('.adv-interest-chk').checked;
+    if(chargeInterest&&(!s||!e))return;
+    const d=(s&&e)?leaseDays(s,e):0;
+    const m=d/30;
+    const interest=chargeInterest?(type==="rs100"?(amt/100)*ir*m:(amt*ir*m)/(12*100)):0;
+    totalAdv+=amt;totalInt+=interest;
+    advList.push({
+      amt,interest:Math.round(interest),days:Math.round(d),s,e,
+      chargeInterest,
+      advMode:r.querySelector('.adv-mode').value,
+      comment:r.querySelector('.adv-comment').value.trim()
+    });
+  });
+
+  const final=yearly-totalAdv+totalInt;
+
+  // Per-advance half-yearly deduction
+  let firstHalf=half,secondHalf=half;
+  if(isHalf){
+    advList.forEach(a=>{
+      const net=a.amt-a.interest;
+      if(a.advMode==='first')firstHalf-=net;
+      else if(a.advMode==='second')secondHalf-=net;
+      else{firstHalf-=net/2;secondHalf-=net/2;}
+    });
+  }
+
+  const kanals=(acres*8).toFixed(2);
+  const lessee=document.getElementById("lessee").value.trim();
+  const modeLabel={none:'Both Halves',first:'1st Half Only',second:'2nd Half Only'};
+
+  let html=`<div class="lease-result">
+${lessee?`<div class="lease-line"><span class="lease-lbl">Lessee</span><span class="lease-val">${lessee}</span></div>`:''}
+<div class="lease-line"><span class="lease-lbl">Land</span><span class="lease-val">${acres.toFixed(2)} Acre · ${kanals} Kanal</span></div>
+<div class="lease-line"><span class="lease-lbl">Year</span><span class="lease-val">${year}</span></div>
+<div class="lease-line"><span class="lease-lbl">Yearly Rent</span><span class="lease-val">${formatAmt(yearly)}</span></div>
+<div class="lease-words">${numberToWords(yearly)}</div>
+${advList.length===0?`<div class="lease-line"><span class="lease-lbl">Advance</span><span class="lease-val">₹0</span></div>
+<div class="lease-line"><span class="lease-lbl">Interest</span><span class="lease-val">₹0</span></div>`
+:advList.map((a,i)=>`<div class="lease-line" style="flex-direction:column;align-items:stretch;gap:2px;padding:7px 0">
+  <div style="display:flex;justify-content:space-between">
+    <span style="font-weight:700;color:var(--text)">Advance${advList.length>1?' '+(i+1):''}</span>
+    <span class="lease-val">${formatAmt(a.amt)}</span>
+  </div>
+  ${a.comment?`<div style="font-size:11px;color:var(--p1);font-weight:500">📝 ${a.comment}</div>`:''}
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim)">
+    ${a.s&&a.e?`<span>${a.s} → ${a.e} (${a.days} days)</span>`:'<span></span>'}
+    <span>${a.chargeInterest?`Interest: ${formatAmt(a.interest)}`:'No Interest'}</span>
+  </div>
+  ${isHalf?`<div style="font-size:11px;color:var(--p1);font-weight:600">↳ Deduct from: ${modeLabel[a.advMode]||'Both halves'}</div>`:''}`
+).join('')}
+<div class="lease-line" style="font-size:12px;opacity:.8"><span class="lease-lbl">Total Advance</span><span class="lease-val">${formatAmt(totalAdv)}</span></div>
+<div class="lease-line" style="font-size:12px;opacity:.8"><span class="lease-lbl">Total Interest</span><span class="lease-val">${formatAmt(totalInt)}</span></div>
+<div class="lease-final"><span>Final Payable</span><span class="lease-val">${formatAmt(final)}</span></div>
+<div class="lease-words">${numberToWords(final)}</div>
+</div>`;
+
+  if(isHalf){
+    html+=`<div class="lease-result half-card">
+<div class="lease-line"><span class="lease-lbl">First Half Payable</span><span class="lease-val" style="background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${formatAmt(firstHalf)}</span></div>
+<div class="lease-line"><span class="lease-lbl">Second Half Payable</span><span class="lease-val" style="background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${formatAmt(secondHalf)}</span></div>
+</div>`;
+  }
+
+  document.getElementById("out").innerHTML=html;
+
+  // Snapshot advances
+  const advSnap=[];
+  document.querySelectorAll(".adv-card").forEach(r=>{
+    advSnap.push({
+      amt:r.querySelector('.adv-amt').value,
+      s:r.querySelector('.adv-start').value,
+      e:r.querySelector('.adv-end').value,
+      mode:r.querySelector('.adv-mode').value,
+      comment:r.querySelector('.adv-comment').value,
+      chargeInterest:r.querySelector('.adv-interest-chk').checked
+    });
+  });
+
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+
+  const entry={
+    lessee:document.getElementById('lessee').value.trim(),
+    land:document.getElementById('land').value,
+    unit:document.getElementById('unit').value,
+    unitLbl:document.getElementById('unit').value==='acre'?'Acre':'Kanal',
+    year:document.getElementById('year').value||'—',
+    rate:document.getElementById('rate').value,
+    payMode:document.getElementById('mode').value,
+    it:document.getElementById('it').value,
+    ir:document.getElementById('lfp_ir').value,
+    advRows:advSnap,
+    yearly:yearly.toFixed(0),
+    final:final.toFixed(0),
+    adv:totalAdv>0?totalAdv.toFixed(0):'',
+    date:dateStr,
+    html,
+    paid:{full:false,first:false,second:false}
+  };
+
+  if(_editingIdx!==null){
+    const h=loadHist();
+    if(h[_editingIdx]&&h[_editingIdx].paid)entry.paid=h[_editingIdx].paid;
+    h[_editingIdx]=entry;
+    saveHist(h);
+    _currentHistIdx=_editingIdx;
+    // keep _editingIdx pointing to current so re-click shows update dialog
+  } else {
+    pushHist(entry);
+    _currentHistIdx=0;
+    _editingIdx=0; // prevent accidental duplicate on re-click
+  }
+  updHistBadge();
+  if(document.getElementById('histDrawer').classList.contains('open'))renderHistList();
+  updateGenerateBtn();
+  renderPaidBar();
+}
+
+function renderPaidBar(){
+  const bar=document.getElementById('paidBar');
+  if(_currentHistIdx===null){bar.style.display='none';return;}
+  const h=loadHist();
+  const entry=h[_currentHistIdx];
+  if(!entry){bar.style.display='none';return;}
+  const paid=entry.paid||{};
+  const isHalf=(entry.payMode||document.getElementById('mode').value)==='half';
+  const today=new Date().toISOString().slice(0,10);
+
+  function btnHtml(key,label){
+    const isPaid=!!paid[key];
+    const isPending=_pendingPaidKey===key;
+    const dateVal=paid[key+'Date']||'';
+    const dateDisplay=dateVal?` · ${fmtDate(dateVal)}`:'';
+    return `<button class="paid-btn${isPaid?' paid':isPending?' pending':''}" onclick="markPaid('${key}')">${isPaid?`✅ ${label} Paid${dateDisplay}`:`⬜ Mark ${label} Paid`}</button>`;
+  }
+
+  let btns='';
+  if(isHalf){
+    btns=btnHtml('first','1st Half')+btnHtml('second','2nd Half');
+  } else {
+    btns=btnHtml('full','Invoice');
+  }
+
+  let datePicker='';
+  if(_pendingPaidKey){
+    datePicker=`<div class="paid-date-row">
+<span class="paid-date-lbl">Paid on:</span>
+<input type="date" id="paidDateInput" value="${today}" style="flex:1;border:1.5px solid rgba(109,40,217,.2);border-radius:9px;padding:7px 10px;font-size:13px;color:var(--text);background:#fff;outline:none">
+<button class="paid-confirm-btn" onclick="confirmPaid()">Save</button>
+<button class="paid-cancel-btn" onclick="cancelPaid()">Cancel</button>
+</div>`;
+  }
+
+  bar.innerHTML=`<div class="paid-bar"><div class="paid-btn-row">${btns}</div>${datePicker}</div>`;
+  bar.style.display='block';
+}
+
+function markPaid(which){
+  if(_currentHistIdx===null)return;
+  const h=loadHist();
+  if(!h[_currentHistIdx])return;
+  if(!h[_currentHistIdx].paid)h[_currentHistIdx].paid={};
+  const isPaid=!!h[_currentHistIdx].paid[which];
+  if(isPaid){
+    // Unmark: clear paid flag and date immediately
+    h[_currentHistIdx].paid[which]=false;
+    h[_currentHistIdx].paid[which+'Date']='';
+    saveHist(h);
+    _pendingPaidKey=null;
+    renderPaidBar();
+    if(document.getElementById('histDrawer').classList.contains('open'))renderHistList();
+  } else {
+    // Show date picker
+    _pendingPaidKey=which;
+    renderPaidBar();
+  }
+}
+
+function confirmPaid(){
+  if(_currentHistIdx===null||!_pendingPaidKey)return;
+  const dateVal=document.getElementById('paidDateInput').value||new Date().toISOString().slice(0,10);
+  const h=loadHist();
+  if(!h[_currentHistIdx])return;
+  if(!h[_currentHistIdx].paid)h[_currentHistIdx].paid={};
+  h[_currentHistIdx].paid[_pendingPaidKey]=true;
+  h[_currentHistIdx].paid[_pendingPaidKey+'Date']=dateVal;
+  saveHist(h);
+  _pendingPaidKey=null;
+  renderPaidBar();
+  if(document.getElementById('histDrawer').classList.contains('open'))renderHistList();
+}
+
+function cancelPaid(){
+  _pendingPaidKey=null;
+  renderPaidBar();
+}
+
+function resetAll(){
+  _leaseGenerated=false;
+  _editingIdx=null;
+  _currentHistIdx=null;
+  _pendingPaidKey=null;
+  document.getElementById("lessee").value="";
+  document.getElementById("land").value="";
+  document.getElementById("unit").value="kanal";
+  document.getElementById("year").value="";
+  document.getElementById("rate").value="1,00,000";
+  document.getElementById("mode").value="yearly";
+  document.getElementById("it").value="rs100";
+  document.getElementById("lfp_ir").value="";
+  document.getElementById("adv").innerHTML="";
+  document.getElementById("advInterestCard").classList.add("hide");
+  document.getElementById("out").innerHTML="";
+  document.getElementById("out").classList.remove("stale");
+  document.getElementById("paidBar").style.display="none";
+  updateGenerateBtn();
+}
+
+// ── Backup / Restore All Data ──
+function backupAll(){
+  const today=new Date().toISOString().slice(0,10);
+  const data={appVersion:APP_VERSION,exportDate:today,lease_invoices:loadHist(),loan_ledger:ldgLoad(),emi_tracker:etkLoad(),emi_themes:etkThemesLoad()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=today+'_finsuite.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function restoreAll(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      const msgs=[];
+      if(Array.isArray(data.lease_invoices)){
+        const existing=loadHist();
+        const lkey=i=>`${i.lessee}_${i.land}_${i.unit}_${i.rate}_${i.year}_${i.date}`;
+        const seen=new Set(existing.map(lkey));
+        const merged=[...data.lease_invoices.filter(i=>!seen.has(lkey(i))),...existing];
+        saveHist(merged.slice(0,50));
+        updHistBadge();
+        msgs.push(`${data.lease_invoices.length} lease invoice(s)`);
+      }
+      if(Array.isArray(data.loan_ledger)){
+        const existing=ldgLoad();
+        const seen=new Set(existing.map(l=>l.id));
+        const merged=[...existing,...data.loan_ledger.filter(l=>!seen.has(l.id))];
+        ldgSave(merged);
+        ldgRender();
+        msgs.push(`${data.loan_ledger.length} ledger loan(s)`);
+      }
+      if(Array.isArray(data.emi_tracker)){
+        const existing=etkLoad();
+        const seen=new Set(existing.map(e=>e.id));
+        const merged=[...existing,...data.emi_tracker.filter(e=>!seen.has(e.id))];
+        etkSaveData(merged);
+        msgs.push(`${data.emi_tracker.length} EMI(s)`);
+      }
+      if(Array.isArray(data.emi_themes)){
+        const existing=etkThemesLoad();
+        const seen=new Set(existing.map(t=>t.id));
+        const merged=[...existing,...data.emi_themes.filter(t=>!seen.has(t.id))];
+        etkThemesSaveData(merged);
+        msgs.push(`${data.emi_themes.length} saved card theme(s)`);
+      }
+      etkRender();
+      if(msgs.length)alert('Backup restored: '+msgs.join(', '));
+      else alert('No recognized data found in backup file.');
+    }catch(err){
+      alert('Restore failed — invalid backup file.');
+    }
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+// Wire static inputs to markStale
+["lessee","land","unit","year","rate","mode","it","lfp_ir"].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener("input",markStale),el.addEventListener("change",markStale);
+});
+document.getElementById("adv").addEventListener("input",markStale);
+document.getElementById("adv").addEventListener("change",markStale);
+
+updHistBadge();
+updateGenerateBtn();
+
+/* ── Keyboard-aware scroll ── */
+document.addEventListener('focusin',function(e){
+  const el=e.target;
+  if(el.tagName==='INPUT'||el.tagName==='SELECT'||el.tagName==='TEXTAREA'){
+    setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'center'});},320);
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+// EMI TRACKER
+// ══════════════════════════════════════════════════════════
+const ETK_KEY='fcp_emi_tracker';
+function etkLoad(){return JSON.parse(localStorage.getItem(ETK_KEY)||'[]');}
+function etkSaveData(d){localStorage.setItem(ETK_KEY,JSON.stringify(d));}
+
+/* ── EMI card color themes ── */
+const ETK_THEME_KEY='fcp_emi_themes';
+function etkThemesLoad(){return JSON.parse(localStorage.getItem(ETK_THEME_KEY)||'[]');}
+function etkThemesSaveData(d){localStorage.setItem(ETK_THEME_KEY,JSON.stringify(d));}
+const ETK_PRESETS=[
+  {name:'HDFC Bank',color:'#004C8F',abbr:'HDFC'},
+  {name:'ICICI Bank',color:'#F58220',abbr:'ICICI'},
+  {name:'State Bank of India',color:'#2D6CB4',abbr:'SBI'},
+  {name:'Axis Bank',color:'#97144D',abbr:'AXIS'},
+  {name:'Kotak Mahindra',color:'#ED232A',abbr:'KOTAK'},
+  {name:'IDFC FIRST Bank',color:'#7C3AED',abbr:'IDFC'},
+  {name:'Yes Bank',color:'#00558C',abbr:'YES'},
+  {name:'IndusInd Bank',color:'#A6192E',abbr:'INDUS'},
+  {name:'Bank of Baroda',color:'#F7941D',abbr:'BOB'},
+  {name:'Punjab National Bank',color:'#8B1E3F',abbr:'PNB'},
+  {name:'American Express',color:'#016FD0',abbr:'AMEX'},
+  {name:'HSBC',color:'#DB0011',abbr:'HSBC'},
+];
+function etkHexToRgba(hex,alpha){
+  const h=hex.replace('#','');
+  const r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+function etkShade(hex,percent){
+  const num=parseInt(hex.replace('#',''),16);
+  const amt=Math.round(2.55*percent);
+  let r=(num>>16)+amt,g=(num>>8&0xff)+amt,b=(num&0xff)+amt;
+  r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));
+  return '#'+(0x1000000+r*0x10000+g*0x100+b).toString(16).slice(1);
+}
+function etkBankInitials(bank){
+  if(!bank)return '';
+  const trimmed=bank.trim();
+  if(!trimmed)return '';
+  const preset=ETK_PRESETS.find(p=>p.name.toLowerCase()===trimmed.toLowerCase());
+  if(preset)return preset.abbr;
+  const stop=['bank','of','the','and','&'];
+  let words=trimmed.split(/\s+/).filter(w=>!stop.includes(w.toLowerCase()));
+  if(!words.length)words=trimmed.split(/\s+/);
+  if(words.length===1)return words[0].toUpperCase().slice(0,5);
+  return words.map(w=>w[0]).join('').toUpperCase().slice(0,4);
+}
+function etkThemeToggle(){
+  const on=document.getElementById('etk-theme-on').checked;
+  document.getElementById('etk-theme-body').style.display=on?'block':'none';
+  if(on)etkUpdateThemePreview();
+}
+function etkRenderPresetChips(){
+  const wrap=document.getElementById('etk-theme-presets');
+  if(wrap.dataset.built)return;
+  wrap.innerHTML=ETK_PRESETS.map(p=>
+    `<button type="button" class="etk-preset-chip" onclick="etkApplyPreset('${p.color}','${p.name.replace(/'/g,"\\'")}')">`+
+    `<span class="etk-preset-dot" style="background:${p.color}"></span>${p.name}</button>`
+  ).join('');
+  wrap.dataset.built='1';
+}
+function etkApplyPreset(color,name){
+  document.getElementById('etk-theme-color').value=color;
+  const nameInput=document.getElementById('etk-theme-name');
+  if(!nameInput.value.trim())nameInput.value=name;
+  const bankInput=document.getElementById('etk-bank');
+  if(!bankInput.value.trim())bankInput.value=name;
+  document.getElementById('etk-theme-select').value='';
+  etkUpdateThemePreview();
+}
+function etkOnBankInput(){
+  if(document.getElementById('etk-theme-on').checked)etkUpdateThemePreview();
+}
+function etkPopulateThemeSelect(selectedId){
+  const sel=document.getElementById('etk-theme-select');
+  const themes=etkThemesLoad();
+  sel.innerHTML='<option value="">Custom color…</option>'+
+    themes.map(t=>`<option value="${t.id}">🎨 ${t.name}</option>`).join('');
+  sel.value=selectedId||'';
+}
+function etkThemeSelectChange(){
+  const sel=document.getElementById('etk-theme-select');
+  if(!sel.value)return;
+  const t=etkThemesLoad().find(x=>x.id===sel.value);
+  if(t){
+    document.getElementById('etk-theme-color').value=t.color;
+    document.getElementById('etk-theme-name').value=t.name;
+  }
+  etkUpdateThemePreview();
+}
+function etkUpdateThemePreview(){
+  const color=document.getElementById('etk-theme-color').value;
+  const bank=document.getElementById('etk-bank').value.trim()||'Bank Name';
+  const darker=etkShade(color,-22);
+  const initials=etkBankInitials(bank);
+  const prev=document.getElementById('etk-theme-preview');
+  prev.style.background=color;
+  prev.style.border='1.5px solid '+darker;
+  prev.innerHTML=
+    `<div style="background:${darker};padding:7px 12px;display:flex;align-items:center;gap:8px">`+
+      `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:22px;padding:0 6px;border-radius:7px;background:rgba(255,255,255,.92);color:${color};font-size:10px;font-weight:800">${initials}</span>`+
+      `<span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.92)">${bank}</span>`+
+    `</div>`+
+    `<div style="padding:10px 12px;font-size:11.5px;font-weight:700;color:#fff">Sample EMI · ₹4,500/mo</div>`;
+}
+function etkSaveTheme(){
+  const name=document.getElementById('etk-theme-name').value.trim();
+  const color=document.getElementById('etk-theme-color').value;
+  const err=document.getElementById('etk-err');
+  if(!name){err.textContent='Enter a name to save this theme.';err.classList.remove('hide');return;}
+  err.classList.add('hide');
+  const themes=etkThemesLoad();
+  const existing=themes.find(t=>t.name.toLowerCase()===name.toLowerCase());
+  let id;
+  if(existing){existing.color=color;id=existing.id;}
+  else{id='theme_'+Date.now();themes.push({id,name,color});}
+  etkThemesSaveData(themes);
+  etkPopulateThemeSelect(id);
+}
+function etkDeleteSelectedTheme(){
+  const sel=document.getElementById('etk-theme-select');
+  if(!sel.value){alert('Pick a saved theme from the dropdown first.');return;}
+  const themes=etkThemesLoad();
+  const t=themes.find(x=>x.id===sel.value);
+  if(!t)return;
+  if(!confirm(`Delete saved theme "${t.name}"? EMI cards already using its color will keep their color.`))return;
+  etkThemesSaveData(themes.filter(x=>x.id!==sel.value));
+  etkPopulateThemeSelect('');
+}
+
+function etkMonthsPaid(startYM){
+  const now=new Date();
+  const [sy,sm]=startYM.split('-').map(Number);
+  return Math.max(0,(now.getFullYear()-sy)*12+(now.getMonth()+1-sm)+1);
+}
+
+function etkCalc(e){
+  const paid=Math.min(etkMonthsPaid(e.startMonth),e.totalEmi);
+  const pending=e.totalEmi-paid;
+  return{paid,pending,done:paid>=e.totalEmi};
+}
+
+function etkCloseMonth(startYM,totalEmi){
+  const [sy,sm]=startYM.split('-').map(Number);
+  const closeMonth=sm+totalEmi-1;
+  const y=sy+Math.floor((closeMonth-1)/12);
+  const m=((closeMonth-1)%12)+1;
+  const names=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return names[m-1]+' '+y;
+}
+
+let etkViewMode='bank';
+function etkSetView(v){
+  etkViewMode=v;
+  document.getElementById('etkv-bank').classList.toggle('on',v==='bank');
+  document.getElementById('etkv-close').classList.toggle('on',v==='close');
+  etkRender();
+}
+
+function etkRender(){
+  const emis=etkLoad();
+  let running=0,totalOutstanding=0,monthlyOut=0;
+  const activeEmis=[];
+  emis.forEach(e=>{
+    const c=etkCalc(e);
+    if(!c.done){running++;monthlyOut+=e.emiAmt;totalOutstanding+=c.pending*e.emiAmt;activeEmis.push({e,pending:c.pending});}
+  });
+  activeEmis.sort((a,b)=>a.pending-b.pending);
+  const nextClose=activeEmis[0];
+  const nextCloseHtml=nextClose
+    ?`<div class="etk-sum-val" style="color:var(--p1);font-size:16px;font-weight:800">${etkCloseMonth(nextClose.e.startMonth,nextClose.e.totalEmi)}</div>`+
+      `<div class="etk-sum-lbl" style="margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Next Free · ${nextClose.e.desc}</div>`
+    :`<div class="etk-sum-val eg">—</div><div class="etk-sum-lbl">Next to Close</div>`;
+
+  document.getElementById('etk-summary').innerHTML=
+    `<div class="etk-sum-card"><div class="etk-sum-val eg">${running}</div><div class="etk-sum-lbl">Running EMIs</div></div>`+
+    `<div class="etk-sum-card"><div class="etk-sum-val" style="color:var(--red);font-size:17px">${ldgFmt(totalOutstanding)}</div><div class="etk-sum-lbl">Total Outstanding</div></div>`+
+    `<div class="etk-sum-card" style="grid-column:1/-1">`+
+      `<div style="display:flex;justify-content:space-between;align-items:flex-start">`+
+        `<div><div class="etk-sum-val pg" style="font-size:17px">${ldgFmt(monthlyOut)}</div><div class="etk-sum-lbl">Monthly Outflow</div></div>`+
+        `${nextClose?`<div style="text-align:right"><div style="font-size:13px;font-weight:800;color:var(--p1)">${etkCloseMonth(nextClose.e.startMonth,nextClose.e.totalEmi)}</div><div style="font-size:10px;color:var(--dim);font-weight:600;margin-top:2px">Next Free · ${nextClose.e.desc} · ${nextClose.e.bank}</div></div>`:''}`+
+      `</div>`+
+    `</div>`;
+
+  if(!emis.length){
+    document.getElementById('etk-groups').innerHTML=
+      `<div style="text-align:center;padding:32px 0;color:var(--dim);font-size:13px"><div style="font-size:36px;margin-bottom:10px">💳</div>No EMIs yet.<br>Tap <strong>＋ Add EMI</strong> to start tracking.</div>`;
+    return;
+  }
+
+  const active=emis.filter(e=>!etkCalc(e).done);
+  const done=emis.filter(e=>etkCalc(e).done);
+  let html='';
+
+  if(etkViewMode==='close'){
+    const sorted=[...activeEmis].map(x=>x.e);
+    if(sorted.length){
+      html+=`<div class="etk-bank-group"><div class="etk-bank-head"><div><div class="etk-bank-name">⏳ All Active EMIs — Closest to Close First</div><div class="etk-bank-meta">${sorted.length} EMI${sorted.length>1?'s':''} · sorted by remaining instalments</div></div></div><div class="etk-bank-body" id="etkg_close" style="display:block">`;
+      sorted.forEach(e=>{html+=etkCardHtml(e);});
+      html+=`</div></div>`;
+    }
+  } else {
+    const banks={};
+    active.forEach(e=>{const b=e.bank||'Other';if(!banks[b])banks[b]=[];banks[b].push(e);});
+    Object.keys(banks).sort().forEach(bank=>{
+      const list=banks[bank];
+      const mo=list.reduce((s,e)=>s+e.emiAmt,0);
+      const tp=list.reduce((s,e)=>s+etkCalc(e).paid,0);
+      const tpend=list.reduce((s,e)=>s+etkCalc(e).pending,0);
+      const gid='etkg_'+bank.replace(/[^a-zA-Z0-9]/g,'_');
+      html+=`<div class="etk-bank-group">`+
+        `<div class="etk-bank-head" onclick="etkToggle('${gid}')">`+
+          `<div><div class="etk-bank-name">🏦 ${bank}</div>`+
+          `<div class="etk-bank-meta">${list.length} EMI${list.length>1?'s':''} · ${ldgFmt(mo)}/mo · ${tp} paid · ${tpend} left</div></div>`+
+          `<span class="etk-bank-chevron open" id="${gid}_c">▼</span>`+
+        `</div>`+
+        `<div class="etk-bank-body" id="${gid}">`;
+      list.forEach(e=>{html+=etkCardHtml(e);});
+      html+=`</div></div>`;
+    });
+  }
+
+  if(done.length){
+    const gid='etkg_done';
+    html+=`<div class="etk-bank-group" style="opacity:.65">`+
+      `<div class="etk-bank-head" onclick="etkToggle('${gid}')">`+
+        `<div><div class="etk-bank-name">✅ Completed (${done.length})</div>`+
+        `<div class="etk-bank-meta">All instalments paid</div></div>`+
+        `<span class="etk-bank-chevron" id="${gid}_c">▼</span>`+
+      `</div>`+
+      `<div class="etk-bank-body" id="${gid}" style="display:none">`;
+    done.forEach(e=>{html+=etkCardHtml(e);});
+    html+=`</div></div>`;
+  }
+
+  document.getElementById('etk-groups').innerHTML=html;
+}
+
+function etkCardHtml(e){
+  const{paid,pending,done}=etkCalc(e);
+  const pct=Math.round((paid/e.totalEmi)*100);
+  const sublbl=e.card?`${e.bank} · ${e.card} · Started ${e.startMonth}`:`${e.bank} · Started ${e.startMonth}`;
+  const remaining=pending*e.emiAmt;
+  const closeMonth=etkCloseMonth(e.startMonth,e.totalEmi);
+  const endingSoon=!done&&pending<=2;
+  let cardStyle='',cardClass='etk-emi-card',themeStrip='';
+  if(endingSoon){
+    cardStyle='border:1.5px solid rgba(180,83,9,.3);background:#fffbeb';
+  }else if(e.themeColor){
+    const base=e.themeColor,darker=etkShade(base,-22);
+    cardStyle=`background:${base};border:1.5px solid ${darker}`;
+    cardClass+=' etk-emi-card-themed';
+    themeStrip=`<div class="etk-emi-theme-strip" style="background:${darker}">`+
+      `<span class="etk-emi-badge" style="color:${base}">${etkBankInitials(e.bank)}</span>`+
+      `<span class="etk-emi-theme-bankname">${e.bank}</span>`+
+    `</div>`;
+  }
+  return`<div class="${cardClass}" style="${cardStyle}">`+themeStrip+
+    `<div class="etk-emi-top">`+
+      `<div><div class="etk-emi-desc">${e.desc}${endingSoon?'<span class="etk-ending-soon">Ending Soon</span>':''}</div><div class="etk-emi-sublbl">${sublbl}</div></div>`+
+      `<div><div class="etk-emi-amt">${ldgFmt(e.emiAmt)}<span class="etk-emi-amt-unit">/mo</span></div>`+
+      `<div class="etk-emi-amt-sub">${done?'Completed':'₹'+Math.round(remaining).toLocaleString('en-IN')+' left'}</div></div>`+
+    `</div>`+
+    `<div class="etk-progress-wrap"><div class="etk-progress-bar${done?' done':''}" style="width:${pct}%"></div></div>`+
+    `<div class="etk-emi-footer"><span>${paid} / ${e.totalEmi} paid${done?' ✅':''}</span>`+
+    `<span style="color:${done?'var(--grn)':'var(--p1)'};font-weight:600">Closes ${closeMonth}</span></div>`+
+    `<div class="etk-emi-actions">`+
+      `<button class="etk-emi-edit" onclick="etkOpenEdit('${e.id}')">✏️ Edit</button>`+
+      `<button class="etk-emi-del" onclick="etkDel('${e.id}')">🗑 Delete</button>`+
+    `</div></div>`;
+}
+
+function etkSwitchTab(which){
+  const isCalc=which==='calc';
+  document.getElementById('emi-calc-section').style.display=isCalc?'':'none';
+  document.getElementById('emi-tracker-section').style.display=isCalc?'none':'';
+  document.getElementById('emi-tab-calc').classList.toggle('on',isCalc);
+  document.getElementById('emi-tab-tracker').classList.toggle('on',!isCalc);
+}
+
+function etkToggle(gid){
+  const body=document.getElementById(gid);
+  const chv=document.getElementById(gid+'_c');
+  if(!body)return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(chv)chv.classList.toggle('open',!open);
+}
+
+function etkOpenAdd(){
+  document.getElementById('etk-modal-title').textContent='➕ Add EMI';
+  document.getElementById('etk-edit-id').value='';
+  ['etk-bank','etk-card','etk-desc','etk-total','etk-amt'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('etk-start').value=new Date().toISOString().slice(0,7);
+  document.getElementById('etk-err').classList.add('hide');
+  const banks=[...new Set(etkLoad().map(e=>e.bank).filter(Boolean))].sort();
+  document.getElementById('etk-bank-list').innerHTML=banks.map(b=>`<option value="${b}">`).join('');
+  etkRenderPresetChips();
+  document.getElementById('etk-theme-on').checked=false;
+  document.getElementById('etk-theme-body').style.display='none';
+  document.getElementById('etk-theme-color').value='#2563eb';
+  document.getElementById('etk-theme-name').value='';
+  etkPopulateThemeSelect('');
+  document.getElementById('etkModal').classList.remove('hide');
+}
+
+function etkOpenEdit(id){
+  const e=etkLoad().find(x=>x.id===id);if(!e)return;
+  document.getElementById('etk-modal-title').textContent='✏️ Edit EMI';
+  document.getElementById('etk-edit-id').value=id;
+  document.getElementById('etk-bank').value=e.bank||'';
+  document.getElementById('etk-card').value=e.card||'';
+  document.getElementById('etk-desc').value=e.desc||'';
+  document.getElementById('etk-total').value=e.totalEmi||'';
+  document.getElementById('etk-amt').value=e.emiAmt||'';
+  document.getElementById('etk-start').value=e.startMonth||'';
+  document.getElementById('etk-err').classList.add('hide');
+  const banks=[...new Set(etkLoad().map(x=>x.bank).filter(Boolean))].sort();
+  document.getElementById('etk-bank-list').innerHTML=banks.map(b=>`<option value="${b}">`).join('');
+  etkRenderPresetChips();
+  if(e.themeColor){
+    document.getElementById('etk-theme-on').checked=true;
+    document.getElementById('etk-theme-body').style.display='block';
+    document.getElementById('etk-theme-color').value=e.themeColor;
+    document.getElementById('etk-theme-name').value='';
+    etkPopulateThemeSelect(e.themeId||'');
+    etkUpdateThemePreview();
+  }else{
+    document.getElementById('etk-theme-on').checked=false;
+    document.getElementById('etk-theme-body').style.display='none';
+    document.getElementById('etk-theme-color').value='#2563eb';
+    document.getElementById('etk-theme-name').value='';
+    etkPopulateThemeSelect('');
+  }
+  document.getElementById('etkModal').classList.remove('hide');
+}
+
+function etkCloseModal(){document.getElementById('etkModal').classList.add('hide');}
+
+function etkSave(){
+  const bank=document.getElementById('etk-bank').value.trim();
+  const card=document.getElementById('etk-card').value.trim();
+  const desc=document.getElementById('etk-desc').value.trim();
+  const total=parseInt(document.getElementById('etk-total').value)||0;
+  const amt=parseFloat(document.getElementById('etk-amt').value)||0;
+  const start=document.getElementById('etk-start').value;
+  const err=document.getElementById('etk-err');
+  if(!bank){err.textContent='Enter bank name.';err.classList.remove('hide');return;}
+  if(!desc){err.textContent='Enter a description.';err.classList.remove('hide');return;}
+  if(total<1){err.textContent='Total EMIs must be at least 1.';err.classList.remove('hide');return;}
+  if(amt<=0){err.textContent='EMI amount must be greater than 0.';err.classList.remove('hide');return;}
+  if(!start){err.textContent='Select a start month.';err.classList.remove('hide');return;}
+  const themeOn=document.getElementById('etk-theme-on').checked;
+  const themeColor=themeOn?document.getElementById('etk-theme-color').value:null;
+  const themeId=themeOn?(document.getElementById('etk-theme-select').value||null):null;
+  const editId=document.getElementById('etk-edit-id').value;
+  const emis=etkLoad();
+  if(editId){
+    const idx=emis.findIndex(x=>x.id===editId);
+    if(idx>=0)emis[idx]={...emis[idx],bank,card,desc,totalEmi:total,emiAmt:amt,startMonth:start,themeColor,themeId};
+  }else{
+    emis.push({id:'etk_'+Date.now(),bank,card,desc,totalEmi:total,emiAmt:amt,startMonth:start,themeColor,themeId});
+  }
+  etkSaveData(emis);etkCloseModal();etkRender();
+}
+
+function etkDel(id){
+  if(!confirm('Delete this EMI entry?'))return;
+  etkSaveData(etkLoad().filter(e=>e.id!==id));
+  etkRender();
+}
+
+etkRender();
+
+</script>
+<div id="delToast"><span class="toast-msg"></span><button class="toast-cancel" onclick="cancelDelete()">Cancel</button><button class="toast-undo" onclick="confirmDelete()">Delete</button></div>
+</body>
+</html>
