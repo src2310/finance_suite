@@ -642,7 +642,7 @@ input[type=color].etk-color-input::-webkit-color-swatch{border:none;border-radiu
     <div class="hico">💎</div>
     <div style="flex:1">
       <div class="htitle">Finance Suite</div>
-      <div class="hsub">v1.9 · Land · Interest · EMI · Lease Finance</div>
+      <div class="hsub">v2.0 · Land · Interest · EMI · Lease Finance · More Tools</div>
     </div>
     <div style="display:flex;gap:5px;flex-shrink:0">
       <button onclick="backupAll()" title="Backup all data to a file" style="background:#fff;border:1.5px solid var(--cb);border-radius:10px;padding:6px 9px;font-size:11px;font-weight:700;color:var(--dim);cursor:pointer;box-shadow:var(--csh);white-space:nowrap">⬇ Backup</button>
@@ -1439,6 +1439,102 @@ input[type=color].etk-color-input::-webkit-color-swatch{border:none;border-radiu
 
   </div>
 
+  <!-- ═══════════════ MORE TAB ═══════════════ -->
+  <div id="t-more" class="tab">
+    <div class="sh">🧰 More Tools</div>
+
+    <!-- Random Number Generator -->
+    <div class="card">
+      <div class="ct">Random Number Generator</div>
+      <div class="ilbl" style="margin-bottom:7px">Number of Digits</div>
+      <div class="seg" id="rngDigitSeg">
+        <button class="sb on" data-d="4" onclick="setRngDigits(this)">4</button>
+        <button class="sb" data-d="5" onclick="setRngDigits(this)">5</button>
+        <button class="sb" data-d="6" onclick="setRngDigits(this)">6</button>
+        <button class="sb" data-d="7" onclick="setRngDigits(this)">7</button>
+        <button class="sb" data-d="8" onclick="setRngDigits(this)">8</button>
+      </div>
+      <div class="btnrow">
+        <button class="cbtn p" onclick="genRandomNum()">🎲 Generate Number</button>
+      </div>
+      <div id="rngResWrap" class="hide">
+        <div class="rcard p" style="margin-top:12px;margin-bottom:0">
+          <div class="rrow"><span class="rlbl">Random Number</span><span class="rval xl pg" id="rngVal">—</span></div>
+        </div>
+        <div class="actrow">
+          <button class="actbtn" onclick="copyText(document.getElementById('rngVal').textContent,this)">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Encrypt / Decrypt -->
+    <div class="card">
+      <div class="ct">Encrypt / Decrypt Number</div>
+      <div class="role-toggle" style="margin-bottom:14px">
+        <button class="role-btn borrower on" id="encModeBtn" onclick="setEncMode('enc')">🔒 Encrypt</button>
+        <button class="role-btn lender" id="decModeBtn" onclick="setEncMode('dec')">🔓 Decrypt</button>
+      </div>
+
+      <!-- Encrypt mode -->
+      <div id="encSec">
+        <div class="irow">
+          <div class="ig">
+            <div class="ilbl">Number to Encrypt</div>
+            <input type="text" id="encNum" class="if" placeholder="e.g. 123456" inputmode="numeric">
+          </div>
+        </div>
+        <div class="irow">
+          <div class="ig">
+            <div class="ilbl">Passphrase <span style="font-weight:400">(needed to decrypt later — don't lose it)</span></div>
+            <input type="password" id="encPass" class="if" placeholder="Enter a strong passphrase">
+          </div>
+        </div>
+        <div class="btnrow">
+          <button class="cbtn p" onclick="doEncrypt()">🔒 Encrypt →</button>
+        </div>
+        <span id="encErr" class="err hide"></span>
+        <div id="encResWrap" class="hide">
+          <div class="sbox" style="word-break:break-all;font-family:monospace;font-size:12px;margin-top:10px" id="encOut"></div>
+          <div class="actrow">
+            <button class="actbtn" onclick="copyText(document.getElementById('encOut').textContent,this)">📋 Copy Encrypted</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decrypt mode -->
+      <div id="decSec" class="hide">
+        <div class="irow">
+          <div class="ig">
+            <div class="ilbl">Encrypted Text</div>
+            <textarea id="decInput" class="if" rows="3" style="resize:vertical;min-height:70px;font-family:monospace;font-size:12px" placeholder="Paste encrypted text here"></textarea>
+          </div>
+        </div>
+        <div class="irow">
+          <div class="ig">
+            <div class="ilbl">Passphrase</div>
+            <input type="password" id="decPass" class="if" placeholder="Enter the passphrase used to encrypt">
+          </div>
+        </div>
+        <div class="btnrow">
+          <button class="cbtn p" onclick="doDecrypt()">🔓 Decrypt →</button>
+        </div>
+        <span id="decErr" class="err hide"></span>
+        <div id="decResWrap" class="hide">
+          <div class="rcard p" style="margin-top:12px;margin-bottom:0">
+            <div class="rrow"><span class="rlbl">Decrypted Number</span><span class="rval xl pg" id="decOut">—</span></div>
+          </div>
+          <div class="actrow">
+            <button class="actbtn" onclick="copyText(document.getElementById('decOut').textContent,this)">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sbox" style="margin-top:12px;margin-bottom:0">
+        🔐 <strong>Strong encryption</strong> — AES-256-GCM with a passphrase-derived key (PBKDF2, 100,000 rounds, random salt per encryption). Without the exact passphrase, the encrypted text cannot be decrypted by anyone — including this app. There is no "forgot passphrase" recovery.
+      </div>
+    </div>
+  </div>
+
   <!-- Tab Bar -->
   <div class="tbbar">
     <button class="tbtn on" onclick="sw('land',this)"><span class="ti">🏡</span><span>Land</span></button>
@@ -1447,6 +1543,7 @@ input[type=color].etk-color-input::-webkit-color-swatch{border:none;border-radiu
     <button class="tbtn" onclick="sw('cmp',this)"><span class="ti">⚖️</span><span>Compare</span></button>
     <button class="tbtn" onclick="sw('ldg',this)"><span class="ti">📒</span><span>Ledger</span></button>
     <button class="tbtn" onclick="sw('lease',this)"><span class="ti">🌾</span><span>Lease</span></button>
+    <button class="tbtn" onclick="sw('more',this)"><span class="ti">🧰</span><span>More</span></button>
   </div>
 
   <div id="toast">✓ Copied</div>
@@ -3980,6 +4077,120 @@ function etkDel(id){
   if(!confirm('Delete this EMI entry?'))return;
   etkSaveData(etkLoad().filter(e=>e.id!==id));
   etkRender();
+}
+
+// ══════════════════════════════════════════════════════════
+// MORE TAB — RANDOM NUMBER + ENCRYPT/DECRYPT
+// ══════════════════════════════════════════════════════════
+function copyText(txt,btn){
+  if(!txt||txt==='—')return;
+  navigator.clipboard.writeText(txt).then(()=>{
+    if(btn){const orig=btn.innerHTML;btn.innerHTML='✓ Copied!';setTimeout(()=>{btn.innerHTML=orig},1800)}
+    const el=document.getElementById('toast');
+    if(_toastTimer){clearTimeout(_toastTimer);el.className=''}
+    void el.offsetWidth;
+    el.className='show';
+    _toastTimer=setTimeout(()=>{
+      el.className='hide-anim';
+      _toastTimer=setTimeout(()=>{el.className=''},220);
+    },1800);
+  }).catch(()=>{});
+}
+
+// -- Random number (unbiased, cryptographically secure) --
+let _rngDigits=4;
+function setRngDigits(btn){
+  document.querySelectorAll('#rngDigitSeg .sb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  _rngDigits=parseInt(btn.dataset.d,10);
+}
+function secureRandomInt(min,max){
+  const range=max-min+1;
+  const bytesNeeded=Math.ceil(Math.log2(range)/8);
+  const maxVal=Math.pow(256,bytesNeeded);
+  const cutoff=maxVal-(maxVal%range);
+  const arr=new Uint8Array(bytesNeeded);
+  let num;
+  do{
+    crypto.getRandomValues(arr);
+    num=0;
+    for(let i=0;i<bytesNeeded;i++)num=num*256+arr[i];
+  }while(num>=cutoff);
+  return min+(num%range);
+}
+function genRandomNum(){
+  const digits=_rngDigits;
+  const min=Math.pow(10,digits-1);
+  const max=Math.pow(10,digits)-1;
+  document.getElementById('rngVal').textContent=secureRandomInt(min,max);
+  document.getElementById('rngResWrap').classList.remove('hide');
+}
+
+// -- Encrypt / Decrypt (AES-256-GCM, PBKDF2 passphrase key) --
+function setEncMode(mode){
+  const isEnc=mode==='enc';
+  document.getElementById('encModeBtn').classList.toggle('on',isEnc);
+  document.getElementById('decModeBtn').classList.toggle('on',!isEnc);
+  document.getElementById('encSec').classList.toggle('hide',!isEnc);
+  document.getElementById('decSec').classList.toggle('hide',isEnc);
+  document.getElementById('encErr').classList.add('hide');
+  document.getElementById('decErr').classList.add('hide');
+}
+async function _deriveAesKey(passphrase,salt){
+  const enc=new TextEncoder();
+  const keyMaterial=await crypto.subtle.importKey('raw',enc.encode(passphrase),{name:'PBKDF2'},false,['deriveKey']);
+  return crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},
+    keyMaterial,
+    {name:'AES-GCM',length:256},
+    false,
+    ['encrypt','decrypt']
+  );
+}
+async function doEncrypt(){
+  const errEl=document.getElementById('encErr');
+  errEl.classList.add('hide');
+  document.getElementById('encResWrap').classList.add('hide');
+  const numStr=document.getElementById('encNum').value.trim();
+  const pass=document.getElementById('encPass').value;
+  if(!numStr){showErr(errEl,'Enter a number to encrypt.');return}
+  if(!pass||pass.length<4){showErr(errEl,'Enter a passphrase (min 4 characters).');return}
+  try{
+    const salt=crypto.getRandomValues(new Uint8Array(16));
+    const iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await _deriveAesKey(pass,salt);
+    const ciphertext=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(numStr));
+    const combined=new Uint8Array(salt.length+iv.length+ciphertext.byteLength);
+    combined.set(salt,0);
+    combined.set(iv,salt.length);
+    combined.set(new Uint8Array(ciphertext),salt.length+iv.length);
+    document.getElementById('encOut').textContent=btoa(String.fromCharCode(...combined));
+    document.getElementById('encResWrap').classList.remove('hide');
+  }catch(e){
+    showErr(errEl,'Encryption failed. Please try again.');
+  }
+}
+async function doDecrypt(){
+  const errEl=document.getElementById('decErr');
+  errEl.classList.add('hide');
+  document.getElementById('decResWrap').classList.add('hide');
+  const b64=document.getElementById('decInput').value.trim();
+  const pass=document.getElementById('decPass').value;
+  if(!b64){showErr(errEl,'Paste the encrypted text.');return}
+  if(!pass){showErr(errEl,'Enter the passphrase.');return}
+  try{
+    const combined=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    if(combined.length<29)throw new Error('bad data');
+    const salt=combined.slice(0,16);
+    const iv=combined.slice(16,28);
+    const ciphertext=combined.slice(28);
+    const key=await _deriveAesKey(pass,salt);
+    const plainBuf=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ciphertext);
+    document.getElementById('decOut').textContent=new TextDecoder().decode(plainBuf);
+    document.getElementById('decResWrap').classList.remove('hide');
+  }catch(e){
+    showErr(errEl,'Decryption failed — wrong passphrase or invalid encrypted text.');
+  }
 }
 
 etkRender();
